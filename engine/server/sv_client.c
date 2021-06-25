@@ -2333,10 +2333,16 @@ void SV_Kill_f( sv_client_t *cl )
 	if( sv.background )
 		return;
 
-	if( !cl || !SV_IsValidEdict( cl->edict ))
+	if( !cl || !SV_IsValidEdict( cl->edict ) )
 		return;
 
-	if( cl->edict->v.health <= 0.0f )
+	if (cl->state != cs_spawned)
+	{
+		SV_ClientPrintf(cl, PRINT_HIGH, "Can't suicide -- not connected!\n");
+		return;
+	}
+
+	if ( cl->edict->v.health <= 0.0f )
 	{
 		SV_ClientPrintf( cl, PRINT_HIGH, "Can't suicide -- already dead!\n");
 		return;
