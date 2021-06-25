@@ -99,6 +99,7 @@ endif()
 
 add_library(vstdlib STATIC
         ${HL2SDK_PATH}/vstdlib/random.cpp
+        ${HL2SDK_PATH}/vstdlib/keyvaluessystem.cpp
 )
 target_include_directories(vstdlib PUBLIC
         ${HL2SDK_PATH}/public
@@ -108,13 +109,23 @@ target_compile_definitions(vstdlib PRIVATE
     -DVSTDLIB_DLL_EXPORT
 )
 
-add_library(tier0 STATIC
+add_library(tier0_h INTERFACE)
+target_include_directories(tier0_h INTERFACE
+        ${HL2SDK_PATH}/public
+        ${HL2SDK_PATH}/public/tier0
+        )
+target_include_directories(tier0_h INTERFACE
+        ${HL2SDK_PATH}
+        )
+add_library(tier0_src INTERFACE)
+target_sources(tier0_src INTERFACE
         ${HL2SDK_PATH}/tier0/assert_dialog.cpp
         ${HL2SDK_PATH}/tier0/cpu.cpp
         ${HL2SDK_PATH}/tier0/dbg.cpp
         ${HL2SDK_PATH}/tier0/fasttimer.cpp
         ${HL2SDK_PATH}/tier0/mem.cpp
         ${HL2SDK_PATH}/tier0/memstd.cpp
+        ${HL2SDK_PATH}/tier0/memdbg.cpp
         ${HL2SDK_PATH}/tier0/mem_helpers.cpp
         ${HL2SDK_PATH}/tier0/memblockhdr.cpp
         ${HL2SDK_PATH}/tier0/memvalidate.cpp
@@ -122,24 +133,39 @@ add_library(tier0 STATIC
         ${HL2SDK_PATH}/tier0/platform.cpp
         ${HL2SDK_PATH}/tier0/pme.cpp
         ${HL2SDK_PATH}/tier0/threadtools.cpp
+        ${HL2SDK_PATH}/tier0/testthread.cpp
+        ${HL2SDK_PATH}/tier0/vcrmode.cpp
+        ${HL2SDK_PATH}/commandline.cpp
 )
 if( POSIX )
-    target_sources(tier0 PRIVATE ${HL2SDK_PATH}/tier0/cpu_posix.cpp)
-    target_sources(tier0 PRIVATE ${HL2SDK_PATH}/tier0/platform_posix.cpp)
-    target_sources(tier0 PRIVATE ${HL2SDK_PATH}/tier0/pme_posix.cpp)
+    target_sources(tier0_src INTERFACE ${HL2SDK_PATH}/tier0/cpu_posix.cpp)
+    target_sources(tier0_src INTERFACE ${HL2SDK_PATH}/tier0/platform_posix.cpp)
+    target_sources(tier0_src INTERFACE ${HL2SDK_PATH}/tier0/pme_posix.cpp)
+    target_sources(tier0_src INTERFACE ${HL2SDK_PATH}/tier0/vcrmode_posix.cpp)
 endif()
-target_include_directories(tier0 PUBLIC
-        ${HL2SDK_PATH}/public
-        ${HL2SDK_PATH}/public/tier0
-        )
-target_include_directories(tier0 PRIVATE
-        ${HL2SDK_PATH}
-        )
+target_link_libraries(tier0_src INTERFACE tier0_h)
+
+add_library(tier0 SHARED)
+target_link_libraries(tier0 PRIVATE tier0_src)
+target_link_libraries(tier0 PUBLIC tier0_h)
 target_compile_definitions(tier0 PRIVATE
+    -DTIER0_DLL_EXPORT
+)
+if( WIN32 )
+    target_link_libraries(tier0 PUBLIC ws2_32)
+endif()
+target_include_directories(tier0 PUBLIC ${PROJECT_BINARY_DIR})
+
+add_library(tier0_static STATIC)
+target_link_libraries(tier0_static PRIVATE tier0_src)
+target_link_libraries(tier0_static PUBLIC tier0_h)
+target_compile_definitions(tier0_static PRIVATE
     -DSTATIC_TIER0
     -DTIER0_DLL_EXPORT
-    -DNO_MALLOC_OVERRIDE
 )
+if( WIN32 )
+    target_link_libraries(tier0_static PUBLIC ws2_32)
+endif()
 
 add_library(tier1 STATIC
         ${HL2SDK_PATH}/tier1/bitbuf.cpp
@@ -181,8 +207,6 @@ endif()
 target_link_libraries(mathlib PUBLIC tier0 tier1)
 target_include_directories(mathlib PUBLIC ${HL2SDK_PATH}/public/mathlib)
 
-target_link_libraries(tier0 PRIVATE vstdlib)
-target_link_libraries(tier0 PRIVATE tier1)
 target_link_libraries(tier1 PUBLIC tier0)
 target_link_libraries(tier1 PRIVATE vstdlib)
 target_link_libraries(tier1 PRIVATE mathlib)

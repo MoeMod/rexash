@@ -1,4 +1,4 @@
-//========= Copyright © 1996-2005, Valve Corporation, All rights reserved. ============//
+//========= Copyright (C) 1996-2005, Valve Corporation, All rights reserved. ============//
 //
 // Purpose: 
 //
@@ -7,7 +7,6 @@
 //=============================================================================//
 #include "platform.h"
 #include "dbg.h"
-#include "strtools.h"
 #include "threadtools.h"
 
 struct CAssertDisable

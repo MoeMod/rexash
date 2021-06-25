@@ -1,4 +1,4 @@
-//===== Copyright © 1996-2005, Valve Corporation, All rights reserved. ======//
+//===== Copyright ?1996-2005, Valve Corporation, All rights reserved. ======//
 //
 // Purpose: 
 //
@@ -179,72 +179,50 @@ HMODULE Sys_LoadLibrary( const char *pLibraryName )
 // Purpose: Loads a DLL/component from disk and returns a handle to it
 // Input  : *pModuleName - filename of the component
 // Output : opaque handle to the module (hides system dependency)
-//-----------------------------------------------------------------------------
-CSysModule *Sys_LoadModule( const char *pModuleName )
+CSysModule	*Sys_LoadModule( const char *pModuleName )
 {
-	// If using the Steam filesystem, either the DLL must be a minimum footprint
-	// file in the depot (MFP) or a filesystem GetLocalCopy() call must be made
-	// prior to the call to this routine.
-#ifndef _XBOX
-	char szCwd[1024];
-#endif
-	HMODULE hDLL = NULL;
-	// if a full path wasn't passed in use the current working dir
-#ifndef _XBOX
-	if ( !Q_IsAbsolutePath(pModuleName) ) // if a full path wasn't passed in
-	{
-		char szAbsoluteModuleName[1024];
-		_getcwd( szCwd, sizeof( szCwd ) );
-		if ( szCwd[ strlen( szCwd ) - 1 ] == '/' )
-        	    szCwd[ strlen( szCwd ) - 1 ] = 0;
-	    Q_snprintf( szAbsoluteModuleName, sizeof(szAbsoluteModuleName),"%s/bin/%s", szCwd, pModuleName );
-		hDLL = Sys_LoadLibrary(szAbsoluteModuleName);
-	}
-#endif
-	if ( !hDLL )
-	{
-		// full path failed, let LoadLibrary() try to search the PATH now
-		hDLL = Sys_LoadLibrary(pModuleName);
-
-#if defined(_DEBUG) && !defined(_XBOX)
-		if( !hDLL )
-		{
-// So you can see what the error is in the debugger...
-#ifdef _WIN32
-			char *lpMsgBuf;
-			
-			FormatMessage( 
-				FORMAT_MESSAGE_ALLOCATE_BUFFER | 
-				FORMAT_MESSAGE_FROM_SYSTEM | 
-				FORMAT_MESSAGE_IGNORE_INSERTS,
-				NULL,
-				GetLastError(),
-				MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), // Default language
-				(LPTSTR) &lpMsgBuf,
-				0,
-				NULL 
-			);
-
-			LocalFree( (HLOCAL)lpMsgBuf );
+#if defined ( _WIN32 )
+	HMODULE hDLL = LoadLibrary( pModuleName );
 #else
-			Error( "Failed to load %s: %s\n",pModuleName, dlerror() );
-#endif // _WIN32
-		}
-#endif // DEBUG
-	}
-
-#ifndef _XBOX
-	// If running in the debugger, assume debug binaries are okay, otherwise they must run with -allowdebug
-	if ( hDLL && 
-		!CommandLine()->FindParm( "-allowdebug" ) && 
-		!Sys_IsDebuggerPresent() )
+	HMODULE hDLL  = NULL;
+	char szAbsoluteModuleName[1024];
+	szAbsoluteModuleName[0] = 0;
+	if ( pModuleName[0] != '/' )
 	{
-		if ( Sys_GetProcAddress( hDLL, "BuiltDebug" ) )
-		{
-			Error( "Module %s is a debug build\n", pModuleName );
-		}
+		char szCwd[1024];
+		char szAbsoluteModuleName[1024];
+
+		getcwd( szCwd, sizeof( szCwd ) );
+		if ( szCwd[ strlen( szCwd ) - 1 ] == '/' )
+			szCwd[ strlen( szCwd ) - 1 ] = 0;
+
+		_snprintf( szAbsoluteModuleName, sizeof(szAbsoluteModuleName), "%s/%s", szCwd, pModuleName );
+
+		hDLL = dlopen( szAbsoluteModuleName, RTLD_NOW );
+	}
+	else
+	{
+		_snprintf( szAbsoluteModuleName, sizeof(szAbsoluteModuleName), "%s", pModuleName );
+		 hDLL = dlopen( pModuleName, RTLD_NOW );
 	}
 #endif
+
+	if( !hDLL )
+	{
+		char str[512];
+#if defined ( _WIN32 )
+		snprintf( str, sizeof(str), "%s.dll", pModuleName );
+		hDLL = LoadLibrary( str );
+#elif defined(OSX)
+		printf("Error:%s\n",dlerror());
+		_snprintf( str, sizeof(str), "%s.dylib", szAbsoluteModuleName );
+		hDLL = dlopen(str, RTLD_NOW);		
+#else
+		printf("Error:%s\n",dlerror());
+		_snprintf( str, sizeof(str), "%s.so", szAbsoluteModuleName );
+		hDLL = dlopen(str, RTLD_NOW);
+#endif
+	}
 
 	return reinterpret_cast<CSysModule *>(hDLL);
 }

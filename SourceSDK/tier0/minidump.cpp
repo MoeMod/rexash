@@ -1,4 +1,4 @@
-//========= Copyright © 1996-2005, Valve Corporation, All rights reserved. ============//
+//========= Copyright (C) 1996-2005, Valve Corporation, All rights reserved. ============//
 //
 // Purpose: 
 //
@@ -162,7 +162,7 @@ void MiniDumpWriter( unsigned int a1, struct _EXCEPTION_POINTERS *a2 )
 				rename( FileName, szRenamed );
 			}
 
-			CallFlushLogFunc();
+			//CallFlushLogFunc();
 		}
 	}
 

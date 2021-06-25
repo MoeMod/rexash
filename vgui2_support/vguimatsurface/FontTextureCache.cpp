@@ -2,7 +2,7 @@
 #include <string.h>
 
 #include "FontTextureCache.h"
-#include "vgui2/vgui_surfacelib/FontManager.h"
+#include "FontManager.h"
 
 #include "vgui_api.h"
 #include "cdll_int.h"
