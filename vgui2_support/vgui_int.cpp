@@ -141,7 +141,7 @@ void VGUI_MouseMove(int x, int y) {
 	g_pInputInternal->InternalCursorMoved(x, y);
 }
 
-extern "C" void EXPORT_FUNCTION InitAPI(vguiapi_t * api) {
+extern "C" void EXPORT InitAPI(vguiapi_t * api) {
 	g_api = api;
 	g_api->Startup = VGui_Startup;
 	g_api->Shutdown = VGui_Shutdown;

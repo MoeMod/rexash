@@ -11,7 +11,6 @@
 // to include this potentially multiple times (since we can deactivate debugging
 // by including memdbgoff.h)
 
-#if 0
 #if !defined(STEAM) && !defined(NO_MALLOC_OVERRIDE)
 
 // SPECIAL NOTE #2: This must be the final include in a .cpp or .h file!!!
@@ -242,4 +241,3 @@ inline wchar_t *MemAlloc_WcStrDup(const wchar_t *pString)
 #endif // _INC_CRTDBG
 
 #endif // !STEAM && !NO_MALLOC_OVERRIDE
-#endif

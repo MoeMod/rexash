@@ -182,7 +182,8 @@ constexpr float DEG2RAD(float x) { return (x) * static_cast<float>(M_PI / 180.f)
 template<class T>
 T clamp(const T &v, typename std::enable_if<true, T>::type a, typename std::enable_if<true, T>::type b)
 {
-	return std::clamp(v, a, b);
+	using std::clamp;
+	return clamp(v, a, b);
 }
 
 // Used to represent sides of things like planes.

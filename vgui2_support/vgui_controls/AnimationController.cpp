@@ -25,7 +25,7 @@
 #include <stdio.h>
 #include <math.h>
 
-#include <mathlib/math_base.h>
+#include <mathlib/mathlib.h>
 
 #include <random>
 

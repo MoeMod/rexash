@@ -114,9 +114,9 @@ add_library(tier0 STATIC
         ${HL2SDK_PATH}/tier0/dbg.cpp
         ${HL2SDK_PATH}/tier0/fasttimer.cpp
         ${HL2SDK_PATH}/tier0/mem.cpp
+        ${HL2SDK_PATH}/tier0/memstd.cpp
         ${HL2SDK_PATH}/tier0/mem_helpers.cpp
         ${HL2SDK_PATH}/tier0/memblockhdr.cpp
-        ${HL2SDK_PATH}/tier0/memstd.cpp
         ${HL2SDK_PATH}/tier0/memvalidate.cpp
         ${HL2SDK_PATH}/tier0/minidump.cpp
         ${HL2SDK_PATH}/tier0/platform.cpp
@@ -138,6 +138,7 @@ target_include_directories(tier0 PRIVATE
 target_compile_definitions(tier0 PRIVATE
     -DSTATIC_TIER0
     -DTIER0_DLL_EXPORT
+    -DNO_MALLOC_OVERRIDE
 )
 
 add_library(tier1 STATIC
@@ -187,3 +188,9 @@ target_link_libraries(tier1 PRIVATE vstdlib)
 target_link_libraries(tier1 PRIVATE mathlib)
 target_link_libraries(vstdlib PRIVATE tier0)
 target_link_libraries(vstdlib PRIVATE tier1)
+
+add_library(SourceSDK STATIC 
+    FileSystem_Helpers.cpp
+)
+target_include_directories(SourceSDK PUBLIC ./ ./public)
+target_link_libraries(SourceSDK PUBLIC tier0 tier1 vstdlib mathlib)

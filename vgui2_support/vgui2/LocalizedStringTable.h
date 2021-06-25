@@ -9,7 +9,7 @@
 
 #include <vgui/ILocalize.h>
 
-class CLocalizedStringTable : vgui2::ILocalize
+class CLocalizedStringTable : public vgui2::ILocalize
 {
 private:
 	struct localizedstring_t

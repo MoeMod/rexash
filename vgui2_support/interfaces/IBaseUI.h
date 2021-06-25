@@ -1,7 +1,7 @@
 #ifndef IBASEUI_H
 #define IBASEUI_H
 
-#include <interface.h>
+#include "tier1/interface.h"
 
 class IBaseUI : public IBaseInterface {
 public:

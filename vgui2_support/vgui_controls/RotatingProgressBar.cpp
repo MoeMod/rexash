@@ -17,7 +17,7 @@
 #include <vgui/ISurface.h>
 
 #include <tier1/KeyValues.h>
-#include <mathlib/math_base.h>
+#include <mathlib/mathlib.h>
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include <tier0/memdbgon.h>

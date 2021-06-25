@@ -5,6 +5,13 @@
 #include "vgui_controls/controls.h"
 #include "filesystem.h"
 
+#ifdef _WIN32
+#include "winsani_in.h"
+#include <windows.h>
+#include "winsani_out.h"
+#endif
+
+
 int LoadBMP(const char *szFilename, byte *buffer, int bufferSize, int *width, int *height)
 {
 	FileHandle_t file = vgui2::filesystem()->Open(szFilename, "rb");

@@ -9,12 +9,19 @@
 #include "ref_params.h"
 #include "cl_entity.h"
 #include "cdll_exp.h"
-#include "APIProxy.h"
 
 #include <FileSystem.h>
+#include "APIProxy.h"
+#include "tier1/interface.h"
 #include "vgui/ISurface.h"
 #include "vgui_controls/controls.h"
 #include "render_api.h"
+
+#ifdef _WIN32
+#include "winsani_in.h"
+#include <Windows.h>
+#include "winsani_in.h"
+#endif
 
 cl_enginefunc_t gEngfuncs;
 render_api_t gRenderAPI;
@@ -57,12 +64,12 @@ int Initialize(cl_enginefunc_t *pEnginefuncs, int iVersion) {
 		return 0;
 	}
 
-	gClDllFuncs_F = (void(*)(void *))Sys_GetProcAddress(pClDllModule, "F");
+	gClDllFuncs_F = (void(*)(void *))GetProcAddress((HMODULE)pClDllModule, "F");
 
 	if (!gClDllFuncs_F) {
 		return 0;
 	}
-	g_pfnMobilityInterface = static_cast<int(*)(mobile_engfuncs_t *)>(Sys_GetProcAddress(pClDllModule, "HUD_MobilityInterface"));
+	g_pfnMobilityInterface = reinterpret_cast<int(*)(mobile_engfuncs_t *)>(GetProcAddress((HMODULE)pClDllModule, "HUD_MobilityInterface"));
 	modfuncs_t modfuncs;
 	gClDllFuncs.pfnInitialize = (INITIALIZE_FUNC)&modfuncs;
 	gClDllFuncs_F(&gClDllFuncs);
@@ -139,7 +146,7 @@ void IN_ClientLookEvent(float relyaw, float relpitch)
 */
 } // namespace ClientDLL_Hooks
 
-extern "C" void EXPORT_FUNCTION F(void *pv) {
+extern "C" void EXPORT F(void *pv) {
 	if (gClDllFuncs_F)
 		gClDllFuncs_F(pv);
 	*reinterpret_cast<cldll_func_t *>(pv) = {
@@ -194,7 +201,7 @@ extern "C" void EXPORT_FUNCTION F(void *pv) {
 	};
 }
 
-int EXPORT_FUNCTION HUD_MobilityInterface(mobile_engfuncs_t *mobileapi)
+int EXPORT HUD_MobilityInterface(mobile_engfuncs_t *mobileapi)
 {
 	using ClientDLL_Hooks::g_pfnMobilityInterface;
 	if (g_pfnMobilityInterface)

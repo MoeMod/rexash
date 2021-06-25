@@ -23,6 +23,8 @@ static wrect_t g_ScissorRect;
 qboolean g_bScissor;
 static int g_iCurrentTexture;
 
+using vgui2::ISurface;
+
 // TODO: implement vgui2::Dar
 std::vector<vgui2::VPANEL> staticPopupList;
 

@@ -69,6 +69,7 @@
 
 #ifdef _WIN32
 	#define IsLinux() false
+	#define IsOSX() false
 	#ifndef _X360
 		#define IsPC() true
 		#define IsConsole() false
@@ -90,6 +91,7 @@
 	#define IsX360() false
 	#define IsPS3() false
 	#define IsLinux() true
+	#define IsOSX() false
 #else
 	#error
 #endif
