@@ -7,6 +7,7 @@ target_include_directories(vgui2_interfaces INTERFACE
     ../engine
     ../pm_shared
 )
+target_link_libraries(vgui2_interfaces INTERFACE vinterface mathlib)
 
 add_subdirectory(vgui_controls)
 
@@ -19,7 +20,6 @@ target_include_directories(vgui_surfacelib PUBLIC
     vgui2/vgui_surfacelib/
 )
 target_link_libraries(vgui_surfacelib PUBLIC vgui2_interfaces)
-target_link_libraries(vgui_surfacelib PRIVATE SourceSDK)
 
 add_library(vguimatsurface STATIC
     vguimatsurface/Clip2D.cpp
@@ -30,7 +30,6 @@ target_include_directories(vgui_surfacelib PRIVATE
 )
 target_link_libraries(vguimatsurface PUBLIC vgui2_interfaces)
 target_link_libraries(vguimatsurface PRIVATE vgui_surfacelib)
-target_link_libraries(vguimatsurface PRIVATE SourceSDK)
 
 add_library(dead_wrapper STATIC
     dead_wrapper/deadfilesystem.cpp
@@ -41,7 +40,7 @@ add_library(dead_wrapper STATIC
 )
 target_link_libraries(dead_wrapper PUBLIC vgui2_interfaces)
 target_link_libraries(dead_wrapper PRIVATE vguimatsurface)
-target_link_libraries(dead_wrapper PRIVATE SourceSDK)
+target_link_libraries(dead_wrapper PRIVATE tier0)
 
 add_library(vgui2_support SHARED
 	BaseUISurface.cpp
@@ -58,7 +57,7 @@ target_link_libraries(vgui2_support PRIVATE vgui_controls)
 target_link_libraries(vgui2_support PRIVATE vgui_surfacelib)
 target_link_libraries(vgui2_support PRIVATE vguimatsurface)
 target_link_libraries(vgui2_support PRIVATE dead_wrapper)
-target_link_libraries(vgui2_support PRIVATE SourceSDK)
+target_link_libraries(vgui2_support PRIVATE tier0)
 
 add_library(vgui2 SHARED
     vgui2/Bitmap.cpp
@@ -81,4 +80,7 @@ target_include_directories(vgui2 PRIVATE
     vgui2/
 )
 target_link_libraries(vgui2 PUBLIC vgui2_interfaces)
+target_link_libraries(vgui2 PRIVATE tier0)
+target_link_libraries(vgui2 PRIVATE tier1)
+target_link_libraries(vgui2 PRIVATE vstdlib)
 target_link_libraries(vgui2 PRIVATE SourceSDK)

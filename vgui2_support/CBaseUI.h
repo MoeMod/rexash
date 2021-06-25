@@ -10,12 +10,13 @@ public:
 	void Start(struct cl_enginefuncs_s *engineFuncs, int interfaceVersion);
 	void Shutdown();
 	int Key_Event(int down, int keynum, const char *pszCurrentBinding);
-	void CallEngineSurfaceAppHandler(void *event, void *userData);
+	void CallEngineSurfaceProc(void* hwnd, unsigned int msg, unsigned int wparam, long lparam);
 	void Paint(int x, int y, int right, int bottom);
 	void HideGameUI();
 	void ActivateGameUI();
 	void HideConsole();
 	void ShowConsole();
+	bool IsGameUIVisible(void);
 
 private:
 	enum { MAX_NUM_FACTORIES = 5 };

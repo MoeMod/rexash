@@ -220,7 +220,7 @@ int CBaseUI::Key_Event(int down, int keynum, const char * pszCurrentBinding) {
 	return 0;
 }
 
-void CBaseUI::CallEngineSurfaceAppHandler(void * event, void * userData) {
+void CBaseUI::CallEngineSurfaceProc(void* hwnd, unsigned int msg, unsigned int wparam, long lparam) {
 }
 
 void CBaseUI::Paint(int x, int y, int right, int bottom) {
@@ -248,6 +248,10 @@ void CBaseUI::HideConsole() {
 }
 
 void CBaseUI::ShowConsole() {
+}
+
+bool CBaseUI::IsGameUIVisible() {
+	return false;
 }
 
 vgui2::VPANEL CEngineVGui::GetPanel(VGUIPANEL type)

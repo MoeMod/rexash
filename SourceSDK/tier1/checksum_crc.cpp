@@ -1,11 +1,11 @@
-//========= Copyright © 1996-2005, Valve Corporation, All rights reserved. ============//
+//========= Copyright (C) 1996-2005, Valve Corporation, All rights reserved. ============//
 //
 // Purpose: Generic CRC functions
 //
 //=============================================================================//
 
-#include "basetypes.h"
-#include "commonmacros.h"
+#include "tier0/basetypes.h"
+#include "tier0/commonmacros.h"
 #include "checksum_crc.h"
 
 // memdbgon must be the last include file in a .cpp file!!!

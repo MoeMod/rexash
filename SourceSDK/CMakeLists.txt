@@ -97,6 +97,15 @@ elseif(${CMAKE_CXX_COMPILER_ID} MATCHES "GNU")
     add_compile_options(-Wno-register -Wno-narrowing -Wno-volatile)
 endif()
 
+add_library(vinterface STATIC
+        ${HL2SDK_PATH}/tier1/interface.cpp
+)
+target_include_directories(vinterface PUBLIC
+        ${HL2SDK_PATH}/public
+        ${HL2SDK_PATH}/public/tier1
+)
+
+
 add_library(vstdlib STATIC
         ${HL2SDK_PATH}/vstdlib/random.cpp
         ${HL2SDK_PATH}/vstdlib/keyvaluessystem.cpp
@@ -145,27 +154,28 @@ if( POSIX )
 endif()
 target_link_libraries(tier0_src INTERFACE tier0_h)
 
-add_library(tier0 SHARED)
-target_link_libraries(tier0 PRIVATE tier0_src)
-target_link_libraries(tier0 PUBLIC tier0_h)
-target_compile_definitions(tier0 PRIVATE
+add_library(tier0_dynamic SHARED)
+target_link_libraries(tier0_dynamic PRIVATE tier0_src)
+target_link_libraries(tier0_dynamic PUBLIC tier0_h)
+target_compile_definitions(tier0_dynamic PRIVATE
     -DTIER0_DLL_EXPORT
 )
 if( WIN32 )
-    target_link_libraries(tier0 PUBLIC ws2_32)
+    target_link_libraries(tier0_dynamic PUBLIC ws2_32)
 endif()
-target_include_directories(tier0 PUBLIC ${PROJECT_BINARY_DIR})
+target_include_directories(tier0_dynamic PUBLIC ${PROJECT_BINARY_DIR})
 
 add_library(tier0_static STATIC)
 target_link_libraries(tier0_static PRIVATE tier0_src)
 target_link_libraries(tier0_static PUBLIC tier0_h)
-target_compile_definitions(tier0_static PRIVATE
+target_compile_definitions(tier0_static PUBLIC
     -DSTATIC_TIER0
-    -DTIER0_DLL_EXPORT
 )
 if( WIN32 )
     target_link_libraries(tier0_static PUBLIC ws2_32)
 endif()
+
+add_library(tier0 ALIAS tier0_static)
 
 add_library(tier1 STATIC
         ${HL2SDK_PATH}/tier1/bitbuf.cpp
@@ -177,7 +187,6 @@ add_library(tier1 STATIC
         ${HL2SDK_PATH}/tier1/datamanager.cpp
         ${HL2SDK_PATH}/tier1/diff.cpp
         ${HL2SDK_PATH}/tier1/generichash.cpp
-        ${HL2SDK_PATH}/tier1/interface.cpp
         ${HL2SDK_PATH}/tier1/KeyValues.cpp
         ${HL2SDK_PATH}/tier1/mempool.cpp
         ${HL2SDK_PATH}/tier1/memstack.cpp
@@ -204,17 +213,15 @@ add_library(mathlib STATIC
 if(NOT MSVC)
     target_compile_options(mathlib PRIVATE -Wno-c++11-narrowing)
 endif()
-target_link_libraries(mathlib PUBLIC tier0 tier1)
-target_include_directories(mathlib PUBLIC ${HL2SDK_PATH}/public/mathlib)
+target_include_directories(mathlib PUBLIC 
+    ${HL2SDK_PATH}/public
+    ${HL2SDK_PATH}/public/mathlib
+)
 
-target_link_libraries(tier1 PUBLIC tier0)
-target_link_libraries(tier1 PRIVATE vstdlib)
-target_link_libraries(tier1 PRIVATE mathlib)
-target_link_libraries(vstdlib PRIVATE tier0)
-target_link_libraries(vstdlib PRIVATE tier1)
+target_link_libraries(tier1 PUBLIC vinterface tier0 mathlib)
+target_link_libraries(vstdlib PUBLIC vinterface tier0)
 
 add_library(SourceSDK STATIC 
     FileSystem_Helpers.cpp
 )
 target_include_directories(SourceSDK PUBLIC ./ ./public)
-target_link_libraries(SourceSDK PUBLIC tier0 tier1 vstdlib mathlib)

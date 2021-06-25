@@ -1,11 +1,11 @@
-//========= Copyright й 1996-2005, Valve Corporation, All rights reserved. ============//
+//========= Copyright гиC) 1996-2005, Valve Corporation, All rights reserved. ============//
 //
 // Purpose: 
 //
 //=============================================================================//
 
-#include "basetypes.h"
-#include "commonmacros.h"
+#include "tier0/basetypes.h"
+#include "tier0/commonmacros.h"
 #include "checksum_md5.h"
 #include <string.h>
 #include <stdio.h>
