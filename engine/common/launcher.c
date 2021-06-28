@@ -66,7 +66,7 @@ int main( int argc, char** argv )
 	const char *gamedir = getenv("XASH3D_GAMEDIR");
 
 	if(!gamedir)
-		gamedir = "valve";
+		gamedir = "cstrike";
 	else
 	{
 		strncpy( gamedir_buf, gamedir, 32 );

@@ -84,3 +84,6 @@ target_link_libraries(vgui2 PRIVATE tier0)
 target_link_libraries(vgui2 PRIVATE tier1)
 target_link_libraries(vgui2 PRIVATE vstdlib)
 target_link_libraries(vgui2 PRIVATE SourceSDK)
+
+set_target_properties(vgui2_support PROPERTIES PREFIX "" OUTPUT_NAME "vgui_support")
+install(TARGETS vgui2_support RUNTIME DESTINATION ".")

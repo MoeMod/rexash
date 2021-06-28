@@ -379,8 +379,7 @@ else()
 endif()
 
 if(XASH_STATIC_GAMELIB)
-	#target_link_libraries(${XASH_ENGINE} xashmenu)
-	target_link_libraries(${XASH_ENGINE} xashmenu client server)
+	target_link_libraries(${XASH_ENGINE} menu client server)
 endif()
 
 if(MSVC)
@@ -530,6 +529,4 @@ endif()
 # engine doesnt support unity build now
 set_target_properties(${XASH_ENGINE} PROPERTIES UNITY_BUILD OFF)
 
-if( NOT XASH_STATIC_GAMELIB )
-	install( TARGETS ${XASH_ENGINE} DESTINATION ".")
-endif()
+install( TARGETS ${XASH_ENGINE} RUNTIME DESTINATION ".")

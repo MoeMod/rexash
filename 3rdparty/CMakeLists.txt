@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 3.10.2)
 
+add_library(sdl2 INTERFACE)
 if(MSVC)
 	add_definitions(-D_ftol2_sse=SDL_ftol2_sse) # fix x86 compile
 endif()

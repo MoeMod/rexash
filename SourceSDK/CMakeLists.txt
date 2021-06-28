@@ -154,16 +154,16 @@ if( POSIX )
 endif()
 target_link_libraries(tier0_src INTERFACE tier0_h)
 
-add_library(tier0_dynamic SHARED)
-target_link_libraries(tier0_dynamic PRIVATE tier0_src)
-target_link_libraries(tier0_dynamic PUBLIC tier0_h)
-target_compile_definitions(tier0_dynamic PRIVATE
-    -DTIER0_DLL_EXPORT
-)
-if( WIN32 )
-    target_link_libraries(tier0_dynamic PUBLIC ws2_32)
-endif()
-target_include_directories(tier0_dynamic PUBLIC ${PROJECT_BINARY_DIR})
+#add_library(tier0_dynamic SHARED)
+#target_link_libraries(tier0_dynamic PRIVATE tier0_src)
+#target_link_libraries(tier0_dynamic PUBLIC tier0_h)
+#target_compile_definitions(tier0_dynamic PRIVATE
+#    -DTIER0_DLL_EXPORT
+#)
+#if( WIN32 )
+#    target_link_libraries(tier0_dynamic PUBLIC ws2_32)
+#endif()
+#target_include_directories(tier0_dynamic PUBLIC ${PROJECT_BINARY_DIR})
 
 add_library(tier0_static STATIC)
 target_link_libraries(tier0_static PRIVATE tier0_src)
