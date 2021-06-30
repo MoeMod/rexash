@@ -179,8 +179,8 @@ typedef struct enginefuncs_s
 	int	(*pfnRegUserMsg)( const char *pszName, int iSize );
 	void	(*pfnAnimationAutomove)( const edict_t* pEdict, float flTime );
 	void	(*pfnGetBonePosition)( const edict_t* pEdict, int iBone, float *rgflOrigin, float *rgflAngles );
-	unsigned long (*pfnFunctionFromName)( const char *pName );
-	const char *(*pfnNameForFunction)( unsigned long function );
+	void* (*pfnFunctionFromName)( const char *pName );
+	const char *(*pfnNameForFunction)( void* function );
 	void	(*pfnClientPrintf)( edict_t* pEdict, PRINT_TYPE ptype, const char *szMsg ); // JOHN: engine callbacks so game DLL can print messages to individual clients
 	void	(*pfnServerPrint)( const char *szMsg );
 	const char *(*pfnCmd_Args)( void );		// these 3 added 
@@ -199,7 +199,7 @@ typedef struct enginefuncs_s
 	byte*	(*pfnLoadFileForMe)( const char *filename, int *pLength );
 	void	(*pfnFreeFile)( void *buffer );
 	void	(*pfnEndSection)( const char *pszSectionName ); // trigger_endsection
-	int	(*pfnCompareFileTime)( char *filename1, char *filename2, int *iCompare );
+	int	(*pfnCompareFileTime)( const char *filename1, const char *filename2, int *iCompare );
 	void	(*pfnGetGameDir)( char *szGetGameDir );
 	void	(*pfnCvar_RegisterVariable)( cvar_t *variable );
 	void	(*pfnFadeClientVolume)( const edict_t *pEdict, int fadePercent, int fadeOutSeconds, int holdTime, int fadeInSeconds );

@@ -325,5 +325,5 @@ debug/
 /out/
 Xcode-iOS/cmake-build
 CMakeSettings.json
-msvc/BundleArtifacts/
+msvc/
 /CSMoE-Full
