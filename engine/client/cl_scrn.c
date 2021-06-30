@@ -21,9 +21,6 @@ GNU General Public License for more details.
 #include "vgui_draw.h"
 #include "qfont.h"
 #include "library.h"
-#ifdef XASH_IMGUI
-#include "imgui_impl_xash.h"
-#endif
 
 convar_t *scr_centertime;
 convar_t *scr_loading;
