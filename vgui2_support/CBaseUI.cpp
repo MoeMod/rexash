@@ -323,7 +323,7 @@ int CBaseUI::Key_Event(int down, int keynum, const char* pszCurrentBinding) {
 				*pszLevelName)
 			{
 				HideGameUI();
-				return true;
+				return false;
 			}
 			else
 			{
@@ -334,7 +334,7 @@ int CBaseUI::Key_Event(int down, int keynum, const char* pszCurrentBinding) {
 		else if (m_bHidingGameUI && keynum == K_MOUSE1 && down)
 		{
 			m_bHidingGameUI = false;
-			return true;
+			return false;
 		}
 		else
 		{
@@ -365,6 +365,8 @@ void CBaseUI::Paint(int x, int y, int right, int bottom) {
 }
 
 void CBaseUI::HideGameUI() {
+	ui::engfuncs.pfnSetKeyDest(key_game);
+	
 	staticGameUIFuncs->HideGameUI();
 	staticGameConsole->Hide();
 
@@ -384,11 +386,11 @@ void CBaseUI::HideGameUI() {
 
 	if (vgui2::input()->IsMouseDown(vgui2::MOUSE_LEFT))
 		m_bHidingGameUI = true;
-	
-	ui::engfuncs.pfnSetKeyDest(key_game);
 }
 
 void CBaseUI::ActivateGameUI() {
+	ui::engfuncs.pfnSetKeyDest(key_menu);
+	
 	staticGameUIFuncs->ActivateGameUI();
 	staticGameUIPanel->SetVisible(true);
 
@@ -403,8 +405,6 @@ void CBaseUI::ActivateGameUI() {
 
 	if (m_bConsoleShowing)
 		staticGameConsole->Activate();
-
-	ui::engfuncs.pfnSetKeyDest(key_menu);
 }
 
 void CBaseUI::HideConsole() {

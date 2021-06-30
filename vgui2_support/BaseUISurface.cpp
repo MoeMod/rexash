@@ -753,6 +753,8 @@ void BaseUISurface::CalculateMouseVisible() {
 		SetCursor(dc_none);
 		LockCursor();
 	}
+
+	g_api->SetVisible(_needMouse);
 }
 
 bool BaseUISurface::NeedKBInput() {

@@ -80,7 +80,7 @@ void VGUI_Key(enum VGUI_KeyAction action, enum VGUI_KeyCode code) {
 		if (KEY_0 <= code && code <= KEY_9) {
 			g_pInputInternal->InternalKeyTyped('0' + (int)code);
 		} else if (KEY_A <= code && code <= KEY_Z) {
-			g_pInputInternal->InternalKeyTyped('a' + (int)code);
+			g_pInputInternal->InternalKeyTyped('a' + (int)(code - KEY_A));
 		} else {
 			switch (code) {
 			case KEY_LBRACKET:
