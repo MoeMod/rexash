@@ -270,8 +270,13 @@ void VGui_Startup( int width, int height )
 		if( !vguiloader[0] && !Sys_GetParmFromCmdLine( "-vguiloader", vguiloader ) )
 			Q_strncpy( vguiloader, VGUI_SUPPORT_DLL, 256 );
 
-		s_pVGuiSupport = Com_LoadLibrary( vguiloader, false );
-
+		s_pVGuiSupport = Com_LoadLibrary( VGUI2_SUPPORT_DLL, false );
+		
+		if( !s_pVGuiSupport )
+		{
+			s_pVGuiSupport = Com_LoadLibrary( vguiloader, false );
+		}
+		
 		if( !s_pVGuiSupport )
 		{
 			s_pVGuiSupport = Com_LoadLibrary( va( "../%s", vguiloader ), false );

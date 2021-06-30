@@ -6520,8 +6520,13 @@ private:
 
 char const *CPanelMessageMapDictionary::StripNamespace( char const *className )
 {
-	constexpr const char szNamespace[] = "vgui2::";
-	if ( !strnicmp( className, szNamespace, strlen(szNamespace) ) )
+	constexpr const char szNamespace[] = "vgui::";
+	if (!strncmp(className, szNamespace, strlen(szNamespace)))
+	{
+		return className + strlen(szNamespace);
+	}
+	constexpr const char szNamespace2[] = "vgui2::";
+	if ( !strncmp( className, szNamespace2, strlen(szNamespace2) ) )
 	{
 		return className + strlen(szNamespace);
 	}

@@ -6,6 +6,8 @@
 #include "IMouseControl.h"
 #include "Color.h"
 
+#include <vector>
+
 class BaseUISurface : public vgui2::ISurface, public IMouseControl {
 	enum {
 		BASE_HEIGHT = 480,

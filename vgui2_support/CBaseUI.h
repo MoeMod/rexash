@@ -27,6 +27,10 @@ private:
 	CSysModule *m_hVGuiModule;
 	CSysModule *m_hChromeModule;
 	CSysModule *m_hClientModule;
+	CSysModule *m_hStaticGameUIModule;
+	
+	bool m_bConsoleShowing = false;
+	bool m_bHidingGameUI = false;
 };
 
 class CEngineVGui : public IEngineVGui

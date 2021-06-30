@@ -70,4 +70,4 @@ add_library(vgui_controls STATIC
 	WizardSubPanel.cpp
 )
 
-target_link_libraries(vgui_controls PUBLIC SourceSDK vgui2_interfaces tier0 tier1 vstdlib)
+target_link_libraries(vgui_controls PUBLIC SourceSDK vgui2_interfaces tier0 tier1 vstdlib dead_wrapper)

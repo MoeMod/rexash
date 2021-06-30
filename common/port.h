@@ -161,6 +161,7 @@ GNU General Public License for more details.
 	#define MENUDLL "menu"ARCH_SUFFIX"." OS_LIB_EXT
 	#define CLIENTDLL "client"ARCH_SUFFIX"." OS_LIB_EXT
 	#define VGUI_SUPPORT_DLL "../vgui_support." OS_LIB_EXT
+	#define VGUI2_SUPPORT_DLL "../vgui2_support." OS_LIB_EXT
 	#include <limits.h>
 
 	#include <io.h>

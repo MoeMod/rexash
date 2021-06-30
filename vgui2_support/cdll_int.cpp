@@ -16,6 +16,7 @@
 #include "vgui/ISurface.h"
 #include "vgui_controls/controls.h"
 #include "render_api.h"
+#include "BaseUISurface.h"
 
 #ifdef _WIN32
 #include "winsani_in.h"
@@ -26,6 +27,8 @@
 cl_enginefunc_t gEngfuncs;
 render_api_t gRenderAPI;
 cldll_func_t gClDllFuncs;
+extern BaseUISurface* staticSurface;
+
 void(*gClDllFuncs_F)(void*) = nullptr;
 
 void VGui_Startup(int width, int height);
@@ -82,6 +85,16 @@ int Initialize(cl_enginefunc_t *pEnginefuncs, int iVersion) {
 	VGui_Startup(screeninfo.iWidth, screeninfo.iHeight);
 
 	return 1; // gClDllFuncs.pInitFunc(pEnginefuncs, iVersion);
+}
+
+int VidInit()
+{
+	SCREENINFO screeninfo;
+	screeninfo.iSize = sizeof(SCREENINFO);
+	gEngfuncs.pfnGetScreenInfo(&screeninfo);
+	staticSurface->SetScreenInfo(&screeninfo);
+	
+	return gClDllFuncs.pfnVidInit();
 }
 
 void HUD_ChatInputPosition(int *x, int *y) {
@@ -152,7 +165,7 @@ extern "C" void EXPORT F(void *pv) {
 	*reinterpret_cast<cldll_func_t *>(pv) = {
 		ClientDLL_Hooks::Initialize,
 		[] { gClDllFuncs.pfnInit(); },
-		[] { return gClDllFuncs.pfnVidInit(); },
+		ClientDLL_Hooks::VidInit,
 		[](float flTime, int intermission) { return gClDllFuncs.pfnRedraw(flTime, intermission); },
 		[](client_data_t *cdata, float flTime) { return gClDllFuncs.pfnUpdateClientData(cdata, flTime); },
 		[] { gClDllFuncs.pfnReset(); },

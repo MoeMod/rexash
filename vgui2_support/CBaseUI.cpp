@@ -3,6 +3,7 @@
 
 #include "vgui_api.h"
 #include "cdll_int.h"
+#include "menu_int.h"
 
 #include "entity_state.h"
 #include "usercmd.h"
@@ -22,16 +23,33 @@
 #include "vgui_controls/controls.h"
 #include "vgui_controls/Panel.h"
 #include "BaseUISurface.h"
+#include "keydefs.h"
+#include "keydest.h"
+
+#include "GameUI/IGameUI.h"
+#include "GameUI/IGameConsole.h"
+#include "GameUI/ICareerUI.h"
 
 extern cldll_func_t gClDllFuncs;
 extern cl_enginefunc_t gEngfuncs;
+namespace ui
+{
+	extern ui_enginefuncs_t engfuncs;
+#ifndef XASH_DISABLE_FWGS_EXTENSIONS
+	extern ui_textfuncs_t	textfuncs;
+#endif
+}
 
 IClientVGUI *staticClient;
+IGameUI* staticGameUIFuncs;
+IGameConsole* staticGameConsole;
+ICareerUI* staticCareerUI;
 vgui2::IInputInternal *g_pInputInternal;
 BaseUISurface *staticSurface;
 
 class CStaticPanel *staticPanel;
 class CEnginePanel *staticClientDLLPanel;
+class CEnginePanel *staticGameUIPanel;
 
 class CEnginePanel : public vgui2::Panel {
 public:
@@ -92,7 +110,7 @@ void CBaseUI::Initialize(CreateInterfaceFn* factories, int count) {
 	m_FactoryList[2] = Sys_GetFactory(m_hFileSystemModule);
 	m_FactoryList[3] = Sys_GetFactory(m_hChromeModule);
 	m_iNumFactories = 4;
-	g_pInputInternal = (vgui2::IInputInternal *)m_FactoryList[1](VGUI_INPUTINTERNAL_INTERFACE_VERSION, NULL);
+	
 	vgui2::VGuiControls_Init("BaseUI", m_FactoryList, m_iNumFactories);
 
 	vgui2::filesystem()->AddSearchPath(".", "BASE");
@@ -102,6 +120,26 @@ void CBaseUI::Initialize(CreateInterfaceFn* factories, int count) {
 	vgui2::filesystem()->AddSearchPath("cstrike", "GAMECONFIG");
 	vgui2::filesystem()->AddSearchPath(gEngfuncs.pfnGetGameDirectory(), "GAMECONFIG");
 	vgui2::filesystem()->AddSearchPath("valve", "GAME_FALLBACK");
+
+	if(!(m_hStaticGameUIModule = Sys_LoadModule("GameUI.dll")))
+	{
+		char szGameUIDLLPath[_MAX_PATH];
+		vgui2::filesystem()->GetLocalPath("cl_dlls/GameUI.dll", szGameUIDLLPath, sizeof(szGameUIDLLPath));
+		m_hStaticGameUIModule = Sys_LoadModule(szGameUIDLLPath);
+	}
+	auto gameUIFactory = Sys_GetFactory(m_hStaticGameUIModule);
+	m_FactoryList[m_iNumFactories] = gameUIFactory;
+
+	if (gameUIFactory)
+	{
+		staticGameUIFuncs = static_cast<IGameUI*>(gameUIFactory(GAMEUI_INTERFACE_VERSION, nullptr));
+		staticGameConsole = static_cast<IGameConsole*>(gameUIFactory(GAMECONSOLE_INTERFACE_VERSION, nullptr));
+		staticCareerUI = static_cast<ICareerUI*>(gameUIFactory(CAREERUI_INTERFACE_VERSION, nullptr));
+
+		++m_iNumFactories;
+	}
+	
+	g_pInputInternal = (vgui2::IInputInternal *)m_FactoryList[1](VGUI_INPUTINTERNAL_INTERFACE_VERSION, NULL);
 
 	char szClientDLLPath[_MAX_PATH];
 	vgui2::filesystem()->GetLocalPath("cl_dlls/client.dll", szClientDLLPath, sizeof(szClientDLLPath));
@@ -124,7 +162,7 @@ void CBaseUI::Start(struct cl_enginefuncs_s *engineFuncs, int interfaceVersion) 
 		staticPanel->SetBgColor(Color(color.r(), color.g(), color.b(), 0xFF));
 	}
 
-	staticPanel->SetBounds(0, 0, 40, 30);
+	//staticPanel->SetBounds(0, 0, 40, 30);
 
 	staticPanel->SetPaintBorderEnabled(false);
 	staticPanel->SetPaintBackgroundEnabled(false);
@@ -176,9 +214,39 @@ void CBaseUI::Start(struct cl_enginefuncs_s *engineFuncs, int interfaceVersion) 
 	//Draw above static panel.
 	staticClientDLLPanel->SetZPos(25);
 
+	staticGameUIPanel = new CEnginePanel(staticPanel, "BaseGameUIPanel");
+
+	{
+		Color color = staticGameUIPanel->GetBgColor();
+
+		//Set alpha to maximum.
+		staticGameUIPanel->SetBgColor(Color(color.r(), color.g(), color.b(), 0xFF));
+	}
+
+	staticGameUIPanel->SetPaintBorderEnabled(false);
+	staticGameUIPanel->SetPaintBackgroundEnabled(false);
+	staticGameUIPanel->SetPaintEnabled(false);
+
+	staticGameUIPanel->SetVisible(true);
+	staticGameUIPanel->SetCursor(vgui2::dc_none);
+
+	//Draw above static and client panels.
+	staticGameUIPanel->SetZPos(50);
+	
+	if (staticGameUIFuncs)
+	{
+		staticGameUIFuncs->Initialize(m_FactoryList, m_iNumFactories);
+	}
+
 	if (staticClient) {
 		staticClient->Initialize(m_FactoryList, m_iNumFactories);
 		staticSurface->SetVGUI2MouseControl(true);
+	}
+
+	if (staticGameUIFuncs)
+	{
+		void* system = nullptr;
+		staticGameUIFuncs->Start(&gEngfuncs, CLDLL_INTERFACE_VERSION, system);
 	}
 
 	staticClientDLLPanel->SetScheme("ClientScheme");
@@ -192,17 +260,40 @@ void CBaseUI::Start(struct cl_enginefuncs_s *engineFuncs, int interfaceVersion) 
 	staticSurface->GetScreenSize(wide, tall);
 	
 	staticPanel->SetBounds(0, 0, wide, tall);
+	staticGameUIPanel->SetBounds(0, 0, wide, tall);
 	staticClientDLLPanel->SetBounds(0, 0, wide, tall);
+	
+	if (staticGameConsole)
+	{
+		staticGameConsole->Initialize();
+		staticGameConsole->SetParent(staticGameUIPanel->GetVPanel());
+	}
 
 	staticSurface->IgnoreMouseVisibility(false);
+
+	if (staticGameUIFuncs)
+	{
+		staticGameUIFuncs->ActivateGameUI();
+	}
 }
 
 void CBaseUI::Shutdown() {
 	vgui2::ivgui()->RunFrame();
 
+	if (staticGameUIFuncs) {
+		staticGameUIFuncs->Shutdown();
+	}
+	
 	if (staticClient) {
 		staticClient->Shutdown();
 	}
+
+	Sys_UnloadModule(m_hStaticGameUIModule);
+	m_hStaticGameUIModule = nullptr;
+
+	staticGameUIFuncs = nullptr;
+	staticGameConsole = nullptr;
+	staticCareerUI = nullptr;
 
 	vgui2::system()->SaveUserConfigFile();
 	Sys_UnloadModule(m_hClientModule);
@@ -216,8 +307,42 @@ void CBaseUI::Shutdown() {
 	m_hFileSystemModule = NULL;
 }
 
-int CBaseUI::Key_Event(int down, int keynum, const char * pszCurrentBinding) {
-	return 0;
+int CBaseUI::Key_Event(int down, int keynum, const char* pszCurrentBinding) {
+	if (keynum == '`' || keynum == '~')
+	{
+		// .
+	}
+	else
+	{
+		if (keynum == K_ESCAPE && down)
+		{
+			const char* pszLevelName = gEngfuncs.pfnGetLevelName();
+
+			if (staticGameUIFuncs->IsGameUIActive() &&
+				pszLevelName &&
+				*pszLevelName)
+			{
+				HideGameUI();
+				return true;
+			}
+			else
+			{
+				ActivateGameUI();
+				return true;
+			}
+		}
+		else if (m_bHidingGameUI && keynum == K_MOUSE1 && down)
+		{
+			m_bHidingGameUI = false;
+			return true;
+		}
+		else
+		{
+			return vgui2::surface()->NeedKBInput();
+		}
+	}
+
+	return false;
 }
 
 void CBaseUI::CallEngineSurfaceProc(void* hwnd, unsigned int msg, unsigned int wparam, long lparam) {
@@ -231,6 +356,7 @@ void CBaseUI::Paint(int x, int y, int right, int bottom) {
 	vgui2::ivgui()->RunFrame();
 	staticSurface->SetScreenBounds(x, y, right - x, bottom - y);
 	staticPanel->SetBounds(0, 0, right, bottom);
+	staticGameUIPanel->SetBounds(0, 0, right, bottom);
 	staticClientDLLPanel->SetBounds(0, 0, right, bottom);
 	//staticPanel->PerformApplySchemeSettings();
 	//staticPanel->InvalidateLayout(false, true);
@@ -239,19 +365,60 @@ void CBaseUI::Paint(int x, int y, int right, int bottom) {
 }
 
 void CBaseUI::HideGameUI() {
+	staticGameUIFuncs->HideGameUI();
+	staticGameConsole->Hide();
+
+	const char* pszLevelName = gEngfuncs.pfnGetLevelName();
+
+	if (pszLevelName && *pszLevelName)
+	{
+		staticGameUIPanel->SetVisible(false);
+		staticGameUIPanel->SetPaintBackgroundEnabled(false);
+
+		staticClientDLLPanel->SetVisible(true);
+		staticClientDLLPanel->SetMouseInputEnabled(true);
+
+		if (staticClient)
+			staticClient->ActivateClientUI();
+	}
+
+	if (vgui2::input()->IsMouseDown(vgui2::MOUSE_LEFT))
+		m_bHidingGameUI = true;
+	
+	ui::engfuncs.pfnSetKeyDest(key_game);
 }
 
 void CBaseUI::ActivateGameUI() {
+	staticGameUIFuncs->ActivateGameUI();
+	staticGameUIPanel->SetVisible(true);
+
+	staticClientDLLPanel->SetVisible(false);
+	staticClientDLLPanel->SetMouseInputEnabled(false);
+
+	if (staticClient)
+	{
+		staticClient->HideClientUI();
+		staticClient->HideScoreBoard();
+	}
+
+	if (m_bConsoleShowing)
+		staticGameConsole->Activate();
+
+	ui::engfuncs.pfnSetKeyDest(key_menu);
 }
 
 void CBaseUI::HideConsole() {
+	m_bConsoleShowing = false;
+	staticGameConsole->Hide();
 }
 
 void CBaseUI::ShowConsole() {
+	m_bConsoleShowing = true;
+	staticGameConsole->Activate();
 }
 
 bool CBaseUI::IsGameUIVisible() {
-	return false;
+	return staticGameUIPanel->IsVisible();
 }
 
 vgui2::VPANEL CEngineVGui::GetPanel(VGUIPANEL type)
@@ -261,8 +428,7 @@ vgui2::VPANEL CEngineVGui::GetPanel(VGUIPANEL type)
 	default:
 	case PANEL_ROOT:		return staticPanel->GetVPanel();
 	case PANEL_CLIENTDLL:	return staticClientDLLPanel->GetVPanel();
-	//case PANEL_GAMEUIDLL:	return staticGameUIPanel->GetVPanel();
-	case PANEL_GAMEUIDLL:	return NULL;
+	case PANEL_GAMEUIDLL:	return staticGameUIPanel->GetVPanel();
 	}
 	return NULL;
 }

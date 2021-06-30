@@ -19,7 +19,7 @@ KeyCode CGameUIFuncs::GetVGUI2KeyCodeForBind(const char *bind) {
 	return KEY_TAB;
 }
 
-void CGameUIFuncs::GetVideoModes(class vmode_s * *, int *) {
+void CGameUIFuncs::GetVideoModes(vmode_t * *, int *) {
 
 }
 

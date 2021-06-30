@@ -3,8 +3,6 @@
 #include "vgui_api.h"
 #include "cdll_int.h"
 
-#include <vector>
-
 #include <FileSystem.h>
 #include "IBaseUI.h"
 #include "vgui/IInput.h"
@@ -15,7 +13,7 @@
 
 vguiapi_t *g_api;
 
-IBaseUI *staticUIFuncs;
+static IBaseUI *staticUIFuncs;
 
 extern cl_enginefunc_t gEngfuncs;
 extern BaseUISurface *staticSurface;
@@ -52,12 +50,10 @@ void VGui_Paint() {
 		return;
 	}
 
-	SCREENINFO screeninfo;
-	screeninfo.iSize = sizeof(screeninfo);
-	gEngfuncs.pfnGetScreenInfo(&screeninfo);
-	staticSurface->SetScreenInfo(&screeninfo);
+	int wide, tall;
+	staticSurface->GetScreenSize(wide, tall);
 	g_bScissor = true;
-	staticUIFuncs->Paint(0, 0, screeninfo.iWidth, screeninfo.iHeight);
+	staticUIFuncs->Paint(0, 0, wide, tall);
 	g_bScissor = false;
 }
 

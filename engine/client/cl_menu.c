@@ -1102,7 +1102,12 @@ qboolean UI_LoadProgs( void )
 	if(!( menu.hInstance = Com_LoadLibrary( "menu", false )))
 		return false;
 #else
-	if(!( menu.hInstance = Com_LoadLibrary( va( "%s/" MENUDLL, GI->dll_path ), false )))
+	if (FS_FileExists(VGUI2_SUPPORT_DLL, false) &&
+		(menu.hInstance = Com_LoadLibrary(VGUI2_SUPPORT_DLL, false)) &&
+		(GetMenuAPI = (MENUAPI)Com_GetProcAddress(menu.hInstance, "GetMenuAPI"))
+		)
+		; // HANDLED BY VGUI2_SUPPORT
+	else if(!( menu.hInstance = Com_LoadLibrary( va( "%s/" MENUDLL, GI->dll_path ), false )))
 	{
 		FS_AllowDirectPaths( true );
 

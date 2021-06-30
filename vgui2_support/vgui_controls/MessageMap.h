@@ -258,10 +258,10 @@ public:							\
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	// no parameters
-#define MAP_MESSAGE( type, name, func )						{ name, (vgui2::MessageFunc_t)(type::func), 0 }
+#define MAP_MESSAGE( type, name, func )						{ name, (vgui2::MessageFunc_t)(&type::func), 0 }
 
 // implicit single parameter (params is the data store)
-#define MAP_MESSAGE_PARAMS( type, name, func )				{ name, (vgui2::MessageFunc_t)(type::func), 1, vgui2::DATATYPE_KEYVALUES, NULL }
+#define MAP_MESSAGE_PARAMS( type, name, func )				{ name, (vgui2::MessageFunc_t)(&type::func), 1, vgui2::DATATYPE_KEYVALUES, NULL }
 
 // single parameter
 #define MAP_MESSAGE_PTR( type, name, func, param1 )			{ name, (vgui2::MessageFunc_t)(&type::func), 1, vgui2::DATATYPE_PTR, param1 }
@@ -354,7 +354,7 @@ public:							\
 		{																		\
 			return new className( NULL, NULL );									\
 		};																		\
-	static CBuildFactoryHelper g_##className##_Helper( #className, Create_##className );\
+	static vgui2::CBuildFactoryHelper g_##className##_Helper( #className, Create_##className );\
 	className *g_##className##LinkerHack = NULL;
 
 #define DECLARE_BUILD_FACTORY_DEFAULT_TEXT( className, defaultText )			\
@@ -362,16 +362,16 @@ public:							\
 		{																		\
 			return new className( NULL, NULL, #defaultText );					\
 		};																		\
-	static CBuildFactoryHelper g_##className##_Helper( #className, Create_##className );\
+	static vgui2::CBuildFactoryHelper g_##className##_Helper( #className, Create_##className );\
 	className *g_##className##LinkerHack = NULL;
 
 // This one allows passing in a special function with calls new panel( xxx ) with arbitrary default parameters
 #define DECLARE_BUILD_FACTORY_CUSTOM( className, createFunc )					\
-	static CBuildFactoryHelper g_##className##_Helper( #className, createFunc );\
+	static vgui2::CBuildFactoryHelper g_##className##_Helper( #className, createFunc );\
 	className *g_##className##LinkerHack = NULL;
 
 #define DECLARE_BUILD_FACTORY_CUSTOM_ALIAS( className, factoryName, createFunc )					\
-	static CBuildFactoryHelper g_##factoryName##_Helper( #factoryName, createFunc );\
+	static vgui2::CBuildFactoryHelper g_##factoryName##_Helper( #factoryName, createFunc );\
 	className *g_##factoryName##LinkerHack = NULL;
 
 } // namespace vgui2

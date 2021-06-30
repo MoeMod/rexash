@@ -10,6 +10,7 @@ target_include_directories(vgui2_interfaces INTERFACE
 target_link_libraries(vgui2_interfaces INTERFACE vinterface mathlib)
 
 add_subdirectory(vgui_controls)
+add_subdirectory(GameUI)
 
 add_library(vgui_surfacelib STATIC
     vgui2/vgui_surfacelib/FontAmalgam.cpp
@@ -50,6 +51,7 @@ add_library(vgui2_support SHARED
     LoadBMP.cpp
     LoadTGA.cpp
     vgui_int.cpp
+    udll_int.cpp
 )
 
 target_link_libraries(vgui2_support PUBLIC vgui2_interfaces)
@@ -85,5 +87,5 @@ target_link_libraries(vgui2 PRIVATE tier1)
 target_link_libraries(vgui2 PRIVATE vstdlib)
 target_link_libraries(vgui2 PRIVATE SourceSDK)
 
-set_target_properties(vgui2_support PROPERTIES PREFIX "" OUTPUT_NAME "vgui_support")
+set_target_properties(vgui2_support PROPERTIES PREFIX "" OUTPUT_NAME "vgui2_support")
 install(TARGETS vgui2_support RUNTIME DESTINATION ".")
