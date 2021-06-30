@@ -667,14 +667,14 @@ void Engine_OnGUI(struct ImGuiContext *context)
 
 void ImGui_ImplGL_Client_OnGUI(void)
 {
-	if (clgame.dllFuncs.pfnOnGUI && cls.key_dest == key_game)
-		clgame.dllFuncs.pfnOnGUI(g_EngineContext);
+	//if (clgame.dllFuncs.pfnOnGUI && cls.key_dest == key_game)
+	//	clgame.dllFuncs.pfnOnGUI(g_EngineContext);
 }
 
 void ImGui_ImplGL_Menu_OnGUI(void)
 {
-	if (menu.dllFuncs.pfnOnGUI && cls.key_dest == key_menu)
-		menu.dllFuncs.pfnOnGUI(g_EngineContext);
+	//if (menu.dllFuncs.pfnOnGUI && cls.key_dest == key_menu)
+	//	menu.dllFuncs.pfnOnGUI(g_EngineContext);
 }
 
 void ImGui_ImplGL_Engine_OnGUI(void)

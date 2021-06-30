@@ -22,6 +22,7 @@
 cmake_minimum_required(VERSION  3.6.0)
 project(XASH_ENGINE C CXX)
 
+set(CMAKE_C_STANDARD 99)
 set(CMAKE_CXX_STANDARD 17)
 
 # fix C++17 register
@@ -35,8 +36,10 @@ option(XASH_DEDICATED "Enable dedicated build. Servers must choose this." OFF) #
 option(XASH_SINGLE_BINARY "Don't build game launcher and build engine as executable" ON)
 if(XASH_DEDICATED)
 	option(XASH_SDL "Enable SDL." OFF) # Dedicated servers still can use SDL
+	option(XASH_IMGUI "Enable IMGUI support" OFF)
 else()
 	option(XASH_SDL "Enable SDL." ON)
+	option(XASH_IMGUI "Enable IMGUI support" ON)
 endif()
 if(CMAKE_SIZEOF_VOID_P MATCHES "8")
 	option(XASH_64BIT "Enable experimental 64-bit build. Note that you must also provide 64-bit game binaries" ON)
