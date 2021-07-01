@@ -848,7 +848,7 @@ byte *GL_ResampleTexture( const byte *source, int inWidth, int inHeight, int out
 
 	if( !source ) return NULL;
 
-	scaledImage = Mem_Realloc( r_temppool, scaledImage, outWidth * outHeight * 4 );
+	scaledImage = (byte*)Mem_Realloc( r_temppool, scaledImage, outWidth * outHeight * 4 );
 	fracStep = inWidth * 0x10000 / outWidth;
 	out = (uint *)scaledImage;
 
@@ -1547,7 +1547,7 @@ int GL_LoadTexture( const char *name, const byte *buf, size_t size, int flags, i
 
 	tex = &r_textures[i];
 	Q_strncpy( tex->name, name, sizeof( tex->name ));
-	tex->flags = flags;
+	tex->flags = (texFlags_t)flags;
 
 	if( flags & TF_SKYSIDE )
 		tex->texnum = tr.skyboxbasenum++;
@@ -3859,7 +3859,7 @@ static rgbdata_t *R_InitDefaultTexture( texFlags_t *flags )
 	r_image.type = PF_RGBA_32;
 	r_image.size = r_image.width * r_image.height * 4;
 
-	*flags = 0;
+	*flags = (texFlags_t)0;
 
 	// emo-texture from quake1
 	for( y = 0; y < 16; y++ )

@@ -156,7 +156,7 @@ void CL_InitParticles( void )
 {
 	int	i;
 
-	cl_particles = Mem_Alloc( cls.mempool, sizeof( particle_t ) * GI->max_particles );
+	cl_particles = (particle_t*)Mem_Alloc( cls.mempool, sizeof( particle_t ) * GI->max_particles );
 	CL_ClearParticles ();
 
 	// this is used for EF_BRIGHTFIELD
@@ -1054,14 +1054,15 @@ CL_RocketTrail
 
 ===============
 */
-void GAME_EXPORT CL_RocketTrail( vec3_t start, vec3_t end, int type )
+void GAME_EXPORT CL_RocketTrail(const vec3_t vStart, const vec3_t end, int type )
 {
-	vec3_t		vec;
+	vec3_t		vec, start;
 	float		len;
 	particle_t	*p;
 	int		j, dec;
 	static int	tracercount;
 
+	VectorCopy(vStart, start);
 	VectorSubtract( end, start, vec );
 	len = VectorNormalizeLength( vec );
 
@@ -1582,27 +1583,26 @@ CL_UserTracerParticle
 
 ===============
 */
-void GAME_EXPORT CL_UserTracerParticle( float *org, float *vel, float life, int colorIndex, float length, byte deathcontext,
-	void (*deathfunc)( particle_t *p ))
+void GAME_EXPORT CL_UserTracerParticle(const float* org, const float* vel, float life, int colorIndex, float length, byte deathcontext, void (*deathfunc)(particle_t* p))
 {
-	particle_t	*p;
-	byte		*color;
+	particle_t* p;
+	byte* color;
 
-	p = CL_AllocParticle( CL_BulletTracerDraw );
-	if( !p ) return;
+	p = CL_AllocParticle(CL_BulletTracerDraw);
+	if (!p) return;
 
-	if( colorIndex > ( sizeof( gTracerColors ) / sizeof( gTracerColors[0] )))
+	if (colorIndex > (sizeof(gTracerColors) / sizeof(gTracerColors[0])))
 	{
-		p->color = bound( 0, colorIndex, 255 );
+		p->color = bound(0, colorIndex, 255);
 	}
 	else
-	{ 
+	{
 		color = gTracerColors[colorIndex];
-		p->color = CL_LookupColor( color[0], color[1], color[2] );
+		p->color = CL_LookupColor(color[0], color[1], color[2]);
 	}
 
-	VectorCopy( org, p->org );
-	VectorCopy( vel, p->vel );
+	VectorCopy(org, p->org);
+	VectorCopy(vel, p->vel);
 	p->ramp = length; // ramp used as length
 	p->context = deathcontext;
 	p->deathfunc = deathfunc;
@@ -1617,7 +1617,7 @@ CL_TracerParticles
 allow more customization
 ===============
 */
-particle_t *GAME_EXPORT CL_TracerParticles( float *org, float *vel, float life )
+particle_t *GAME_EXPORT CL_TracerParticles( const float *org, const float *vel, float life )
 {
 	particle_t	*p;
 	byte		*color;

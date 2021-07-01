@@ -719,7 +719,7 @@ void R_Strobe_Tick( void )
 
 	if ( r_strobe_cooldown->integer > 0 )
 	{
-		if ( ( strobe.cdTimer > (double)abs( r_strobe_cooldown->integer ) ) && strobe.cdTriggered == true )
+		if ( ( strobe.cdTimer > (double)abs( r_strobe_cooldown->integer ) ) && strobe.cdTriggered)
 		{
 			strobe.cdTriggered = false;
 			strobe.cdTimer     = -1.0;

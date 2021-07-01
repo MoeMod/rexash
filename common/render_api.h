@@ -129,6 +129,8 @@ typedef enum
 	TF_FLOATDATA	= (1<<28),
 } texFlags_t;
 
+DEFINE_ENUM_FLAG_OPERATORS(texFlags_t)
+
 typedef struct beam_s BEAM;
 typedef struct particle_s particle_t;
 
@@ -194,7 +196,7 @@ typedef struct render_api_s
 	void		(*R_EntityRemoveDecals)( struct model_s *mod ); // remove all the decals from specified entity (BSP only)
 
 	// AVIkit support
-	void		*(*AVI_LoadVideo)( const char *filename, int ignore_hwgamma );
+	void		*(*AVI_LoadVideo)( const char *filename, bool ignore_hwgamma );
 	int		(*AVI_GetVideoInfo)( void *Avi, long *xres, long *yres, float *duration );
 	long		(*AVI_GetVideoFrameNumber)( void *Avi, float time );
 	byte		*(*AVI_GetVideoFrame)( void *Avi, long frame );
@@ -214,7 +216,7 @@ typedef struct render_api_s
 	void		(*GL_Reserved0)( void );	// for potential interface expansion without broken compatibility
 	void		(*GL_Reserved1)( void );
 	void		(*GL_Reserved2)( void );
-	void		(*GL_Reserved3)( void );
+	void		(*GL_Scissor)(int enable, int x, int y, int width, int height);
 		
 	// Misc renderer functions
 	void		(*GL_DrawParticles)( const float *vieworg, const float *fwd, const float *rt, const float *up, unsigned int clipFlags );

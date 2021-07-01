@@ -91,24 +91,24 @@ NET_AddMaster
 Add master to the list
 ========================
 */
-static void NET_AddMaster( char *addr, qboolean save )
+static void NET_AddMaster(const char* addr, qboolean save)
 {
-	master_t *master, *last;
+	master_t* master, * last;
 
-	for( last = ml.list; last && last->next; last = last->next )
+	for (last = ml.list; last && last->next; last = last->next)
 	{
-		if( !Q_strcmp( last->address, addr ) ) // already exists
+		if (!Q_strcmp(last->address, addr)) // already exists
 			return;
 	}
 
-	master = (master_t*)Mem_Alloc( host.mempool, sizeof( master_t ) );
-	Q_strncpy( master->address, addr, MAX_STRING );
+	master = (master_t*)Mem_Alloc(host.mempool, sizeof(master_t));
+	Q_strncpy(master->address, addr, MAX_STRING);
 	master->sent = false;
 	master->save = save;
 	master->next = NULL;
 
 	// link in
-	if( last )
+	if (last)
 		last->next = master;
 	else
 		ml.list = master;

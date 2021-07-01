@@ -29,7 +29,7 @@ typedef struct
 	// console auto-complete
 	string		shortestMatch;
 	field_t		*completionField;	// con.input or dedicated server fake field-line
-	char		*completionString;
+	const char	*completionString;
 	char		*cmds[CON_MAXCMDS];
 	int		matchCount;
 } autocomlete_t;

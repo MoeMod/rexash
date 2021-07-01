@@ -263,9 +263,6 @@ void Touch_WriteConfig( void )
 
 void Touch_ExportConfig_f( void )
 {
-	file_t	*f;
-	char *name;
-
 	if( Cmd_Argc() != 2 )
 	{
 		Msg( "Usage: touch_exportconfig <name>\n" );
@@ -274,10 +271,10 @@ void Touch_ExportConfig_f( void )
 
 	if( !touch.list_user.first ) return;
 
-	name = Cmd_Argv( 1 );
+	auto name = Cmd_Argv( 1 );
 
 	MsgDev( D_NOTE, "Exporting config to %s\n", name );
-	f = FS_Open( name, "w", true );
+	auto f = FS_Open( name, "w", true );
 	if( f )
 	{
 		char profilename[256];

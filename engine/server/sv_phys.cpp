@@ -1934,7 +1934,7 @@ static server_physics_api_t gPhysicsAPI =
 	SV_LinkEdict,
 	SV_GetServerTime,
 	SV_GetFrameTime,
-	(void*)Mod_Handle,
+	(void* (*)(int))Mod_Handle,
 	SV_GetHeadNode,
 	SV_ServerState,
 	Host_Error,

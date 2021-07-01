@@ -387,7 +387,7 @@ void CL_CenterPrint( const char *text, float y )
 	clgame.centerPrint.totalWidth = 0;
 	clgame.centerPrint.time = cl.mtime[0]; // allow pause for centerprint
 	Q_strncpy( clgame.centerPrint.message, text, sizeof( clgame.centerPrint.message ));
-	s = clgame.centerPrint.message;
+	s = (byte*)clgame.centerPrint.message[0];
 
 	// count the number of lines for centering
 	while( *s )
@@ -1155,9 +1155,9 @@ void CL_InitEdicts( void )
 
 	CL_UPDATE_BACKUP = ( cl.maxclients == 1 ) ? SINGLEPLAYER_BACKUP : MULTIPLAYER_BACKUP;
 	cls.num_client_entities = CL_UPDATE_BACKUP * 64;
-	cls.packet_entities = Z_Realloc( cls.packet_entities, sizeof( entity_state_t ) * cls.num_client_entities );
-	clgame.entities = Mem_Alloc( clgame.mempool, sizeof( cl_entity_t ) * clgame.maxEntities );
-	clgame.static_entities = Mem_Alloc( clgame.mempool, sizeof( cl_entity_t ) * MAX_STATIC_ENTITIES );
+	cls.packet_entities = (entity_state_t*)Z_Realloc( cls.packet_entities, sizeof( entity_state_t ) * cls.num_client_entities );
+	clgame.entities = (cl_entity_t*)Mem_Alloc( clgame.mempool, sizeof( cl_entity_t ) * clgame.maxEntities );
+	clgame.static_entities = (cl_entity_t*)Mem_Alloc( clgame.mempool, sizeof( cl_entity_t ) * MAX_STATIC_ENTITIES );
 	clgame.numStatics = 0;
 
 	if(( clgame.maxRemapInfos - 1 ) != clgame.maxEntities )
@@ -1419,7 +1419,7 @@ pfnSPR_GetList
 for parsing half-life scripts - hud.txt etc
 =========
 */
-static client_sprite_t *GAME_EXPORT pfnSPR_GetList( char *psz, int *piCount )
+static client_sprite_t *GAME_EXPORT pfnSPR_GetList( const char *psz, int *piCount )
 {
 	client_sprite_t	*pList;
 	int		index, numSprites = 0;
@@ -1444,7 +1444,7 @@ static client_sprite_t *GAME_EXPORT pfnSPR_GetList( char *psz, int *piCount )
 
 	// name, res, pic, x, y, w, h
 	// NOTE: we must use com_studiocache because it will be purge on next restart or change map
-	pList = Mem_Alloc( pool, sizeof( client_sprite_t ) * numSprites );
+	pList = (client_sprite_t*)Mem_Alloc( pool, sizeof( client_sprite_t ) * numSprites );
 
 	for( index = 0; index < numSprites; index++ )
 	{
@@ -1773,7 +1773,7 @@ pfnDrawConsoleString
 drawing string like a console string 
 =============
 */
-int GAME_EXPORT pfnDrawConsoleString( int x, int y, char *string )
+int GAME_EXPORT pfnDrawConsoleString( int x, int y, const char *string )
 {
 	int	drawLen;
 
@@ -1970,7 +1970,7 @@ pfnCheckParm
 
 =============
 */
-static int GAME_EXPORT pfnCheckParm( char *parm, char **ppnext )
+static int GAME_EXPORT pfnCheckParm( const char *parm, const char **ppnext )
 {
 	static char	str[64];
 
@@ -2168,7 +2168,7 @@ static pmtrace_t *GAME_EXPORT pfnTraceLine( float *start, float *end, int flags,
 	return &tr;
 }
 
-static void GAME_EXPORT pfnPlaySoundByNameAtLocation( char *szSound, float volume, float *origin )
+static void GAME_EXPORT pfnPlaySoundByNameAtLocation( const char *szSound, float volume, float *origin )
 {
 	int hSound = S_RegisterSound( szSound );
 	S_StartSound( origin, 0, CHAN_ITEM, hSound, volume, 1.0, PITCH_NORM, 0 );
@@ -2708,7 +2708,7 @@ pfnServerCmdUnreliable
 
 =============
 */
-static int GAME_EXPORT pfnServerCmdUnreliable( char *szCmdString )
+static int GAME_EXPORT pfnServerCmdUnreliable( const char *szCmdString )
 {
 	if( !szCmdString || !szCmdString[0] )
 		return 0;
@@ -2728,7 +2728,7 @@ pfnGetMousePos
 static void GAME_EXPORT pfnGetMousePos( POINT *ppt )
 {
 #ifdef XASH_SDL
-	SDL_GetMouseState(&ppt->x, &ppt->y);
+	SDL_GetMouseState((int*)&ppt->x, (int*)&ppt->y);
 #else
 	ppt->x = ppt->y = 0;
 #endif
@@ -2942,7 +2942,7 @@ pfnPlaySoundVoiceByName
 
 =============
 */
-static void GAME_EXPORT pfnPlaySoundVoiceByName( char *filename, float volume, int pitch )
+static void GAME_EXPORT pfnPlaySoundVoiceByName( const char *filename, float volume, int pitch )
 {
 	int hSound = S_RegisterSound( filename );
 
@@ -2955,7 +2955,7 @@ pfnMP3_InitStream
 
 =============
 */
-static void GAME_EXPORT pfnMP3_InitStream( char *filename, int looping )
+static void GAME_EXPORT pfnMP3_InitStream( const char *filename, int looping )
 {
 	if( !filename )
 	{
@@ -2979,7 +2979,7 @@ pfnPlaySoundByNameAtPitch
 
 =============
 */
-static void GAME_EXPORT pfnPlaySoundByNameAtPitch( char *filename, float volume, int pitch )
+static void GAME_EXPORT pfnPlaySoundByNameAtPitch( const char *filename, float volume, int pitch )
 {
 	int hSound = S_RegisterSound( filename );
 	S_StartSound( NULL, cl.refdef.viewentity, CHAN_ITEM, hSound, volume, 1.0, pitch, SND_STOP_LOOPING );
@@ -3246,7 +3246,7 @@ int GAME_EXPORT TriSpriteTexture( model_t *pSpriteModel, int frame )
 		gl_texturenum = tr.defaultTexture;
 	}
 
-	psprite = pSpriteModel->cache.data;
+	psprite = (msprite_t *)pSpriteModel->cache.data;
 	if( psprite->texFormat == SPR_ALPHTEST )
 	{
 		pglEnable( GL_ALPHA_TEST );
@@ -3724,14 +3724,14 @@ triangleapi_t gTriApi =
 	TriColor4f,
 	TriColor4ub,
 	TriTexCoord2f,
-	(void*)TriVertex3fv,
+	TriVertex3fv,
 	TriVertex3f,
 	TriBrightness,
 	TriCullFace,
 	TriSpriteTexture,
-	(void*)R_WorldToScreen,	// NOTE: XPROJECT, YPROJECT should be done in client.dll
+	R_WorldToScreen,	// NOTE: XPROJECT, YPROJECT should be done in client.dll
 	TriFog,
-	(void*)R_ScreenToWorld,
+	R_ScreenToWorld,
 	TriGetMatrix,
 	TriBoxInPVS,
 	TriLightAtPoint,
@@ -3742,75 +3742,75 @@ triangleapi_t gTriApi =
 static efx_api_t gEfxApi =
 {
 	CL_AllocParticle,
-	(void*)CL_BlobExplosion,
-	(void*)CL_Blood,
-	(void*)CL_BloodSprite,
-	(void*)CL_BloodStream,
-	(void*)CL_BreakModel,
-	(void*)CL_Bubbles,
-	(void*)CL_BubbleTrail,
-	(void*)CL_BulletImpactParticles,
+	CL_BlobExplosion,
+	CL_Blood,
+	CL_BloodSprite,
+	CL_BloodStream,
+	CL_BreakModel,
+	CL_Bubbles,
+	CL_BubbleTrail,
+	CL_BulletImpactParticles,
 	CL_EntityParticles,
 	CL_Explosion,
 	CL_FizzEffect,
 	CL_FireField,
-	(void*)CL_FlickerParticles,
-	(void*)CL_FunnelSprite,
-	(void*)CL_Implosion,
-	(void*)CL_Large_Funnel,
-	(void*)CL_LavaSplash,
-	(void*)CL_MultiGunshot,
-	(void*)CL_MuzzleFlash,
-	(void*)CL_ParticleBox,
-	(void*)CL_ParticleBurst,
-	(void*)CL_ParticleExplosion,
-	(void*)CL_ParticleExplosion2,
-	(void*)CL_ParticleLine,
+	CL_FlickerParticles,
+	CL_FunnelSprite,
+	CL_Implosion,
+	CL_Large_Funnel,
+	CL_LavaSplash,
+	CL_MultiGunshot,
+	CL_MuzzleFlash,
+	CL_ParticleBox,
+	CL_ParticleBurst,
+	CL_ParticleExplosion,
+	CL_ParticleExplosion2,
+	CL_ParticleLine,
 	CL_PlayerSprites,
-	(void*)CL_Projectile,
-	(void*)CL_RicochetSound,
-	(void*)CL_RicochetSprite,
-	(void*)CL_RocketFlare,
+	CL_Projectile,
+	CL_RicochetSound,
+	CL_RicochetSprite,
+	CL_RocketFlare,
 	CL_RocketTrail,
-	(void*)CL_RunParticleEffect,
-	(void*)CL_ShowLine,
-	(void*)CL_SparkEffect,
-	(void*)CL_SparkShower,
-	(void*)CL_SparkStreaks,
-	(void*)CL_Spray,
+	CL_RunParticleEffect,
+	CL_ShowLine,
+	CL_SparkEffect,
+	CL_SparkShower,
+	CL_SparkStreaks,
+	CL_Spray,
 	CL_Sprite_Explode,
 	CL_Sprite_Smoke,
-	(void*)CL_Sprite_Spray,
-	(void*)CL_Sprite_Trail,
+	CL_Sprite_Spray,
+	CL_Sprite_Trail,
 	CL_Sprite_WallPuff,
-	(void*)CL_StreakSplash,
-	(void*)CL_TracerEffect,
+	CL_StreakSplash,
+	CL_TracerEffect,
 	CL_UserTracerParticle,
 	CL_TracerParticles,
-	(void*)CL_TeleportSplash,
-	(void*)CL_TempSphereModel,
-	(void*)CL_TempModel,
-	(void*)CL_DefaultSprite,
-	(void*)CL_TempSprite,
+	CL_TeleportSplash,
+	CL_TempSphereModel,
+	CL_TempModel,
+	CL_DefaultSprite,
+	CL_TempSprite,
 	CL_DecalIndex,
-	(void*)CL_DecalIndexFromName,
+	CL_DecalIndexFromName,
 	CL_DecalShoot,
 	CL_AttachTentToPlayer,
 	CL_KillAttachedTents,
-	(void*)CL_BeamCirclePoints,
-	(void*)CL_BeamEntPoint,
+	CL_BeamCirclePoints,
+	CL_BeamEntPoint,
 	CL_BeamEnts,
 	CL_BeamFollow,
 	CL_BeamKill,
-	(void*)CL_BeamLightning,
-	(void*)CL_BeamPoints,
-	(void*)CL_BeamRing,
+	CL_BeamLightning,
+	CL_BeamPoints,
+	CL_BeamRing,
 	CL_AllocDlight,
 	CL_AllocElight,
-	(void*)CL_TempEntAlloc,
-	(void*)CL_TempEntAllocNoModel,
-	(void*)CL_TempEntAllocHigh,
-	(void*)CL_TempEntAllocCustom,
+	CL_TempEntAlloc,
+	CL_TempEntAllocNoModel,
+	CL_TempEntAllocHigh,
+	CL_TempEntAllocCustom,
 	CL_GetPackedColor,
 	CL_LookupColor,
 	CL_DecalRemoveAll,
@@ -3897,15 +3897,15 @@ static cl_enginefunc_t gEngfuncs =
 	CL_FillRGBA,
 	pfnGetScreenInfo,
 	pfnSetCrosshair,
-	(void*)pfnCvar_RegisterVariable,
-	(void*)Cvar_VariableValue,
-	(void*)Cvar_VariableString,
-	(void*)pfnAddClientCommand,
-	(void*)pfnHookUserMsg,
-	(void*)pfnServerCmd,
-	(void*)pfnClientCmd,
+	pfnCvar_RegisterVariable,
+	Cvar_VariableValue,
+	Cvar_VariableString,
+	pfnAddClientCommand,
+	pfnHookUserMsg,
+	pfnServerCmd,
+	pfnClientCmd,
 	pfnGetPlayerInfo,
-	(void*)pfnPlaySoundByName,
+	pfnPlaySoundByName,
 	pfnPlaySoundByIndex,
 	AngleVectors,
 	CL_TextMessageGet,
@@ -3920,7 +3920,7 @@ static cl_enginefunc_t gEngfuncs =
 	pfnGetViewAngles,
 	pfnSetViewAngles,
 	CL_GetMaxClients,
-	(void*)Cvar_SetFloat,
+	Cvar_SetFloat,
 	Cmd_Argc,
 	Cmd_Argv,
 	Con_Printf,
@@ -3931,7 +3931,7 @@ static cl_enginefunc_t gEngfuncs =
 	pfnServerInfo_ValueForKey,
 	pfnGetClientMaxspeed,
 	pfnCheckParm,
-	(void*)Key_Event,
+	Key_Event,
 	CL_GetMousePosition,
 	pfnIsNoClipping,
 	CL_GetLocalPlayer,
@@ -3940,8 +3940,8 @@ static cl_enginefunc_t gEngfuncs =
 	pfnGetClientTime,
 	pfnCalcShake,
 	pfnApplyShake,
-	(void*)pfnPointContents,
-	(void*)CL_WaterEntity,
+	pfnPointContents,
+	CL_WaterEntity,
 	pfnTraceLine,
 	CL_LoadModel,
 	CL_AddEntity,
@@ -3952,8 +3952,8 @@ static cl_enginefunc_t gEngfuncs =
 	CL_WeaponAnim,
 	Com_RandomFloat,
 	Com_RandomLong,
-	(void*)pfnHookEvent,
-	(void*)Con_Visible,
+	pfnHookEvent,
+	Con_Visible,
 	pfnGetGameDirectory,
 	pfnCVarGetPointer,
 	Key_LookupBinding,
@@ -3962,7 +3962,7 @@ static cl_enginefunc_t gEngfuncs =
 	pfnSetScreenFade,
 	pfnVGui_GetPanel,
 	VGui_ViewportPaintBackground,
-	(void*)COM_LoadFile,
+	COM_LoadFile,
 	COM_ParseFile,
 	COM_FreeFile,
 	&gTriApi,
@@ -3985,9 +3985,9 @@ static cl_enginefunc_t gEngfuncs =
 	pfnSetMousePos,
 	pfnSetMouseEnable,
 	Cvar_GetList,
-	(void*)Cmd_GetFirstFunctionHandle,
-	(void*)Cmd_GetNextFunctionHandle,
-	(void*)Cmd_GetName,
+	(void* (*)(void))Cmd_GetFirstFunctionHandle,
+	(void* (*)(void*))Cmd_GetNextFunctionHandle,
+	(const char* (*)(void*))Cmd_GetName,
 	pfnGetClientOldTime,
 	pfnGetGravity,
 	Mod_Handle,
@@ -4002,9 +4002,9 @@ static cl_enginefunc_t gEngfuncs =
 	LocalPlayerInfo_ValueForKey,
 	pfnVGUI2DrawCharacter,
 	pfnVGUI2DrawCharacterAdditive,
-	(void*)Sound_GetApproxWavePlayLen,
+	Sound_GetApproxWavePlayLen,
 	GetCareerGameInterface,
-	(void*)Cvar_Set,
+	Cvar_Set,
 	pfnIsCareerMatch,
 	pfnPlaySoundVoiceByName,
 	pfnMP3_InitStream,
@@ -4082,7 +4082,7 @@ qboolean CL_LoadProgs( const char *name )
 		*func->func = NULL;
 
 	// trying to get single export named 'F'
-	if(( F = (void *)Com_GetProcAddress( clgame.hInstance, "F" )) != NULL )
+	if(( *(void**)&F = Com_GetProcAddress( clgame.hInstance, "F" )) != NULL )
 	{
 		MsgDev( D_NOTE, "CL_LoadProgs: found single callback export\n" );		
 

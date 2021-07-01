@@ -562,7 +562,7 @@ static void GAME_EXPORT pfnStuckTouch( int hitent, pmtrace_t *tr )
 	clgame.pmove->touchindex[clgame.pmove->numtouch++] = *tr;
 }
 
-static int GAME_EXPORT pfnPointContents( float *p, int *truecontents )
+static int GAME_EXPORT pfnPointContents( const float *p, int *truecontents )
 {
 	int	cont, truecont;
 

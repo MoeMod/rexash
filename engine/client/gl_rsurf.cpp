@@ -152,7 +152,7 @@ static void SubdividePolygon_r( msurface_t *warpface, int numverts, float *verts
 	}
 
 	// add a point in the center to help keep warp valid
-	poly = Mem_Alloc( loadmodel->mempool, sizeof( glpoly_t ) + ( ( numverts - 4 ) + 2) * VERTEXSIZE * sizeof( float ));
+	poly = (glpoly_t*)Mem_Alloc( loadmodel->mempool, sizeof( glpoly_t ) + ( ( numverts - 4 ) + 2) * VERTEXSIZE * sizeof( float ));
 	poly->next = warpface->polys;
 	poly->flags = warpface->flags;
 	warpface->polys = poly;
@@ -328,7 +328,7 @@ void GL_BuildPolygonFromSurface( model_t *mod, msurface_t *fa )
 	vertpage = 0;
 
 	// draw texture
-	poly = Mem_Alloc( mod->mempool, sizeof( glpoly_t ) + ( lnumverts - 4 ) * VERTEXSIZE * sizeof( float ) );
+	poly = (glpoly_t*)Mem_Alloc( mod->mempool, sizeof( glpoly_t ) + ( lnumverts - 4 ) * VERTEXSIZE * sizeof( float ) );
 	poly->next = fa->polys;
 	poly->flags = fa->flags;
 	fa->polys = poly;
@@ -383,13 +383,13 @@ void GL_BuildPolygonFromSurface( model_t *mod, msurface_t *fa )
 		for( i = 0; i < lnumverts; i++ )
 		{
 			vec3_t	v1, v2;
-			float	*prev, *this, *next;
+			float	*prev, *pthis, *next;
 
 			prev = &verts_p[VERTEXSIZE * ((i + lnumverts - 1) % lnumverts)];
 			next = &verts_p[VERTEXSIZE * ((i + 1) % lnumverts)];
-			this = &verts_p[VERTEXSIZE * i];
+			pthis = &verts_p[VERTEXSIZE * i];
 
-			VectorSubtract( this, prev, v1 );
+			VectorSubtract( pthis, prev, v1 );
 			VectorNormalize( v1 );
 			VectorSubtract( next, prev, v2 );
 			VectorNormalize( v2 );
@@ -676,7 +676,7 @@ static void LM_UploadBlock( qboolean dynamic )
 		r_lightmap.size = r_lightmap.width * r_lightmap.height * 4;
 		r_lightmap.flags = ( world.version == Q1BSP_VERSION ) ? 0 : IMAGE_HAS_COLOR;
 		r_lightmap.buffer = gl_lms.lightmap_buffer;
-		tr.lightmapTextures[i] = GL_LoadTextureInternal( lmName, &r_lightmap, TF_FONT, false );
+		tr.lightmapTextures[i] = GL_LoadTextureInternal( lmName, &r_lightmap, (texFlags_t)TF_FONT, false );
 		GL_SetTextureType( tr.lightmapTextures[i], TEX_LIGHTMAP );
 
 		if( tr.deluxemap )
@@ -689,7 +689,7 @@ static void LM_UploadBlock( qboolean dynamic )
 			r_deluxemap.flags = IMAGE_HAS_COLOR;
 			r_deluxemap.buffer = gl_lms.deluxemap_buffer;
 			Q_snprintf( lmName, sizeof( lmName ), "*deluxemap%i", i );
-			tr.deluxemapTextures[i] = GL_LoadTextureInternal( lmName, &r_deluxemap, TF_FONT, false );
+			tr.deluxemapTextures[i] = GL_LoadTextureInternal( lmName, &r_deluxemap, (texFlags_t)TF_FONT, false );
 		}
 
 		if( ++gl_lms.current_lightmap_texture == MAX_LIGHTMAPS )
@@ -1671,8 +1671,8 @@ void R_DrawBrushModel( cl_entity_t *e )
 		}
 	}
 
-	if( need_sort && !gl_nosort->integer )
-		qsort( world.draw_surfaces, num_sorted, sizeof( msurface_t* ), (void*)R_SurfaceCompare );
+	if (need_sort && !gl_nosort->integer)
+		qsort(world.draw_surfaces, num_sorted, sizeof(msurface_t*), (_CoreCrtNonSecureSearchSortCompareFunction)R_SurfaceCompare);
 
 	// draw sorted translucent surfaces
 	for( i = 0; i < num_sorted; i++ )
@@ -1927,11 +1927,11 @@ void R_GenerateVBO()
 	vbos.mintexture = INT_MAX;
 	vbos.maxtexture = 0;
 
-	vbos.textures = Mem_Alloc( vbos.mempool, numtextures * numlightmaps * sizeof( vbotexture_t ) );
-	vbos.surfdata = Mem_Alloc( vbos.mempool, cl.worldmodel->numsurfaces * sizeof( vbosurfdata_t ) );
-	vbos.arraylist = vbo = Mem_Alloc( vbos.mempool, sizeof( vboarray_t ) );
-	vbos.decaldata = Mem_Alloc( vbos.mempool, sizeof( vbodecaldata_t ) );
-	vbos.decaldata->lm = Mem_Alloc( vbos.mempool, sizeof( msurface_t* ) * numlightmaps );
+	vbos.textures = (vbotexture_t*)Mem_Alloc( vbos.mempool, numtextures * numlightmaps * sizeof( vbotexture_t ) );
+	vbos.surfdata = (vbosurfdata_t*)Mem_Alloc( vbos.mempool, cl.worldmodel->numsurfaces * sizeof( vbosurfdata_t ) );
+	vbos.arraylist = vbo = (vboarray_t*)Mem_Alloc( vbos.mempool, sizeof( vboarray_t ) );
+	vbos.decaldata = (vbodecaldata_t*)Mem_Alloc( vbos.mempool, sizeof( vbodecaldata_t ) );
+	vbos.decaldata->lm = (msurface_t**)Mem_Alloc( vbos.mempool, sizeof( msurface_t* ) * numlightmaps );
 
 	// count array lengths
 	for( k = 0; k < numlightmaps; k++ )
@@ -1959,11 +1959,11 @@ void R_GenerateVBO()
 				if( vbo->array_len + surf->polys->numverts > USHRT_MAX )
 				{
 					// generate new array and new vbotexture node
-					vbo->array = Mem_Alloc( vbos.mempool, sizeof( vbovertex_t ) * vbo->array_len );
+					vbo->array = (vbovertex_t*)Mem_Alloc( vbos.mempool, sizeof( vbovertex_t ) * vbo->array_len );
 					MsgDev( D_NOTE, "R_GenerateVBOs: allocated array of %d verts, texture %d\n", vbo->array_len, j );
-					vbo->next = Mem_Alloc( vbos.mempool, sizeof( vboarray_t ) );
+					vbo->next = (vboarray_t*)Mem_Alloc( vbos.mempool, sizeof( vboarray_t ) );
 					vbo = vbo->next;
-					vbotex->next = Mem_Alloc( vbos.mempool, sizeof( vbotexture_t ) );
+					vbotex->next = (vbotexture_t*)Mem_Alloc( vbos.mempool, sizeof( vbotexture_t ) );
 					vbotex = vbotex->next;
 
 					// never skip this textures and lightmaps
@@ -1987,7 +1987,7 @@ void R_GenerateVBO()
 	}
 
 	// allocate last array
-	vbo->array = Mem_Alloc( vbos.mempool, sizeof( vbovertex_t ) * vbo->array_len );
+	vbo->array = (vbovertex_t*)Mem_Alloc( vbos.mempool, sizeof( vbovertex_t ) * vbo->array_len );
 	MsgDev( D_NOTE, "R_GenerateVBOs: allocated array of %d verts\n", vbo->array_len );
 
 	// switch to list begin
@@ -2004,7 +2004,7 @@ void R_GenerateVBO()
 			vbotexture_t *vbotex = &vbos.textures[k * numtextures + j];
 
 			// preallocate index arrays
-			vbotex->indexarray = Mem_Alloc( vbos.mempool, sizeof( unsigned short ) * vbotex->len );
+			vbotex->indexarray = (unsigned short*)Mem_Alloc( vbos.mempool, sizeof( unsigned short ) * vbotex->len );
 			vbotex->lightmaptexturenum = k;
 
 			if( maxindex < vbotex->len )
@@ -2036,7 +2036,7 @@ void R_GenerateVBO()
 
 					vbo = vbo->next;
 					vbotex = vbotex->next;
-					vbotex->indexarray = Mem_Alloc( vbos.mempool, sizeof( unsigned short ) * vbotex->len );
+					vbotex->indexarray = (unsigned short*)Mem_Alloc( vbos.mempool, sizeof( unsigned short ) * vbotex->len );
 					vbotex->lightmaptexturenum = k;
 
 					// calculate limits for dlights
@@ -2084,10 +2084,10 @@ void R_GenerateVBO()
 	pglBufferDataARB( GL_ARRAY_BUFFER_ARB, sizeof( vbovertex_t ) * DECAL_VERTS_CUT * MAX_RENDER_DECALS, vbos.decaldata->decalarray, GL_STATIC_DRAW_ARB );
 
 	// preallocate dlight arrays
-	vbos.dlight_index = Mem_Alloc( vbos.mempool, maxindex * sizeof( unsigned short ) * 6 );
+	vbos.dlight_index = (unsigned short*)Mem_Alloc( vbos.mempool, maxindex * sizeof( unsigned short ) * 6 );
 
 	// select maximum possible length for dlight
-	vbos.dlight_tc = Mem_Alloc( vbos.mempool, sizeof( vec2_t ) * (int)(vbos.arraylist->next?USHRT_MAX + 1:vbos.arraylist->array_len + 1) );
+	vbos.dlight_tc = (vec2_t*)Mem_Alloc( vbos.mempool, sizeof( vec2_t ) * (int)(vbos.arraylist->next?USHRT_MAX + 1:vbos.arraylist->array_len + 1) );
 
 	if( r_vbo_dlightmode->integer == 1 )
 	{
@@ -2629,10 +2629,10 @@ static void R_DrawLightmappedVBO( vboarray_t *vbo, vbotexture_t *vbotex, texture
 					R_SetDecalMode( true );
 					if( vbos.decal_dlight_vbo )
 					{
-						pglTexCoordPointer( 2, GL_FLOAT, sizeof( vbovertex_t ), offsetof( vbovertex_t, lm_tc ) );
+						pglTexCoordPointer( 2, GL_FLOAT, sizeof( vbovertex_t ), (const GLvoid*)offsetof( vbovertex_t, lm_tc ) );
 						GL_SelectTexture( mtst.tmu_gl );
-						pglTexCoordPointer( 2, GL_FLOAT, sizeof( vbovertex_t ), offsetof( vbovertex_t, gl_tc ) );
-						pglVertexPointer( 3, GL_FLOAT, sizeof( vbovertex_t ), offsetof( vbovertex_t, pos ) );
+						pglTexCoordPointer( 2, GL_FLOAT, sizeof( vbovertex_t ), (const GLvoid*)offsetof( vbovertex_t, gl_tc ) );
+						pglVertexPointer( 3, GL_FLOAT, sizeof( vbovertex_t ), (const GLvoid*)offsetof( vbovertex_t, pos ) );
 					}
 					else
 					{
@@ -2811,10 +2811,10 @@ static void R_DrawLightmappedVBO( vboarray_t *vbo, vbotexture_t *vbotex, texture
 				R_SetDecalMode( true );
 				if( vbos.decal_dlight_vbo )
 				{
-					pglTexCoordPointer( 2, GL_FLOAT, sizeof( vbovertex_t ), offsetof( vbovertex_t, lm_tc ) );
+					pglTexCoordPointer( 2, GL_FLOAT, sizeof( vbovertex_t ), (const GLvoid*)offsetof( vbovertex_t, lm_tc ) );
 					GL_SelectTexture( mtst.tmu_gl );
-					pglTexCoordPointer( 2, GL_FLOAT, sizeof( vbovertex_t ), offsetof( vbovertex_t, gl_tc ) );
-					pglVertexPointer( 3, GL_FLOAT, sizeof( vbovertex_t ), offsetof( vbovertex_t, pos ) );
+					pglTexCoordPointer( 2, GL_FLOAT, sizeof( vbovertex_t ), (const GLvoid*)offsetof( vbovertex_t, gl_tc ) );
+					pglVertexPointer( 3, GL_FLOAT, sizeof( vbovertex_t ), (const GLvoid*)offsetof( vbovertex_t, pos ) );
 				}
 				else
 				{

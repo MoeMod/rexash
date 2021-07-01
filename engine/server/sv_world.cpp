@@ -328,7 +328,7 @@ hull_t *SV_HullForStudioModel( edict_t *ent, vec3_t mins, vec3_t maxs, vec3_t of
 			vec3_t		angles;
 			int		iBlend;
 
-			pstudio = Mod_Extradata( mod );
+			pstudio = (studiohdr_t *)Mod_Extradata( mod );
 			pseqdesc = (mstudioseqdesc_t *)((byte *)pstudio + pstudio->seqindex) + ent->v.sequence;
 			VectorCopy( ent->v.angles, angles );
 

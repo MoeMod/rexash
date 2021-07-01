@@ -140,13 +140,11 @@ Handle "mp3" console command
 */
 void CL_MP3Command_f ( void )
 {
-	char *pszCommand, *pszTrack;
-
 	if ( Cmd_Argc() < 2 )
 		return;
 
-	pszCommand = Cmd_Argv (1);
-	pszTrack = Cmd_Argv (2);
+	auto pszCommand = Cmd_Argv (1);
+	auto pszTrack = Cmd_Argv (2);
 
 	if (Q_stricmp(pszCommand, "play") == 0)
 	{

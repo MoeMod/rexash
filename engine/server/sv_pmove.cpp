@@ -334,7 +334,7 @@ static void GAME_EXPORT pfnStuckTouch( int hitent, pmtrace_t *tr )
 	svgame.pmove->touchindex[svgame.pmove->numtouch++] = *tr;
 }
 
-static int GAME_EXPORT pfnPointContents( float *p, int *truecontents )
+static int GAME_EXPORT pfnPointContents( const float *p, int *truecontents )
 {
 	int	cont, truecont;
 
@@ -576,7 +576,7 @@ void SV_InitClientMove( void )
 	Q_memcpy( svgame.pmove->player_maxs, svgame.player_maxs, sizeof( svgame.player_maxs ));
 
 	// common utilities
-	svgame.pmove->PM_Info_ValueForKey = (void*)Info_ValueForKey;
+	svgame.pmove->PM_Info_ValueForKey = Info_ValueForKey;
 	svgame.pmove->PM_Particle = pfnParticle;
 	svgame.pmove->PM_TestPlayerPosition = pfnTestPlayerPosition;
 	svgame.pmove->Con_NPrintf = Con_NPrintf;
@@ -589,14 +589,14 @@ void SV_InitClientMove( void )
 	svgame.pmove->PM_HullPointContents = pfnHullPointContents;
 	svgame.pmove->PM_PlayerTrace = pfnPlayerTrace;
 	svgame.pmove->PM_TraceLine = pfnTraceLine;
-	svgame.pmove->RandomLong = (void*)Com_RandomLong;
+	svgame.pmove->RandomLong = Com_RandomLong;
 	svgame.pmove->RandomFloat = Com_RandomFloat;
 	svgame.pmove->PM_GetModelType = pfnGetModelType;
 	svgame.pmove->PM_GetModelBounds = pfnGetModelBounds;
-	svgame.pmove->PM_HullForBsp = (void*)pfnHullForBsp;
+	svgame.pmove->PM_HullForBsp = (void* (*)(physent_t* pe, float* offset))pfnHullForBsp;
 	svgame.pmove->PM_TraceModel = pfnTraceModel;
-	svgame.pmove->COM_FileSize = (void*)COM_FileSize;
-	svgame.pmove->COM_LoadFile =(void*)COM_LoadFile;
+	svgame.pmove->COM_FileSize = COM_FileSize;
+	svgame.pmove->COM_LoadFile = COM_LoadFile;
 	svgame.pmove->COM_FreeFile = COM_FreeFile;
 	svgame.pmove->memfgets = COM_MemFgets;
 	svgame.pmove->PM_PlaySound = pfnPlaySound;

@@ -1913,26 +1913,26 @@ qboolean MSG_ReadDeltaEntity( sizebuf_t *msg, entity_state_t *from, entity_state
   
 =============================================================================
 */
-void GAME_EXPORT Delta_AddEncoder( char *name, pfnDeltaEncode encodeFunc )
+void GAME_EXPORT Delta_AddEncoder(const char* name, pfnDeltaEncode encodeFunc)
 {
-	delta_info_t	*dt;
+	delta_info_t* dt;
 
-	dt = Delta_FindStructByEncoder( name );
+	dt = Delta_FindStructByEncoder(name);
 
-	if( !dt || !dt->bInitialized )
+	if (!dt || !dt->bInitialized)
 	{
-		MsgDev( D_ERROR, "Delta_AddEncoder: couldn't find delta with specified custom encode %s\n", name );
+		MsgDev(D_ERROR, "Delta_AddEncoder: couldn't find delta with specified custom encode %s\n", name);
 		return;
 	}
 
-	if( dt->customEncode == CUSTOM_NONE )
+	if (dt->customEncode == CUSTOM_NONE)
 	{
-		MsgDev( D_ERROR, "Delta_AddEncoder: %s not supposed for custom encoding\n", dt->pName );
+		MsgDev(D_ERROR, "Delta_AddEncoder: %s not supposed for custom encoding\n", dt->pName);
 		return;
 	}
 
 	// register new encode func
-	dt->userCallback = encodeFunc;	
+	dt->userCallback = encodeFunc;
 }
 
 int Delta_FindField( delta_t *pFields, const char *fieldname )

@@ -2258,22 +2258,22 @@ HTTP_AddDownload
 Add new download to end of queue
 ===================
 */
-void HTTP_AddDownload( char *path, int size, qboolean process )
+void HTTP_AddDownload(const char* path, int size, qboolean process)
 {
-	httpfile_t *httpfile = (httpfile_t *)Mem_Alloc( net_mempool, sizeof( httpfile_t ) );
+	httpfile_t* httpfile = (httpfile_t*)Mem_Alloc(net_mempool, sizeof(httpfile_t));
 
-	MsgDev( D_INFO, "File %s queued to download\n", path );
+	MsgDev(D_INFO, "File %s queued to download\n", path);
 
 	httpfile->size = size;
 	httpfile->downloaded = 0;
 	httpfile->socket = -1;
-	Q_strncpy ( httpfile->path, path, sizeof( httpfile->path ) );
+	Q_strncpy(httpfile->path, path, sizeof(httpfile->path));
 
-	if( http.last_file )
+	if (http.last_file)
 	{
 		// Add next to last download
 		httpfile->id = http.last_file->id + 1;
-		http.last_file->next= httpfile;
+		http.last_file->next = httpfile;
 		http.last_file = httpfile;
 	}
 	else

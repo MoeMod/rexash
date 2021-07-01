@@ -28,58 +28,58 @@ COM_ParseFile
 text parser
 ==============
 */
-char *GAME_EXPORT COM_ParseFile( char *data, char *token )
+char* GAME_EXPORT COM_ParseFile(char* data, char* token)
 {
 	int	c, len;
 
-	if( !token )
+	if (!token)
 		return NULL;
 
 	len = 0;
 	token[0] = 0;
 
-	if( !data )
+	if (!data)
 		return NULL;
-// skip whitespace
+	// skip whitespace
 skipwhite:
-	while(( c = ((byte)*data)) <= ' ' )
+	while ((c = ((byte)*data)) <= ' ')
 	{
-		if( c == 0 )
+		if (c == 0)
 			return NULL;	// end of file;
 		data++;
 	}
 
 	// skip // comments
-	if( c=='/' && data[1] == '/' )
+	if (c == '/' && data[1] == '/')
 	{
-		while( *data && *data != '\n' )
+		while (*data && *data != '\n')
 			data++;
 		goto skipwhite;
 	}
 
 	// handle quoted strings specially
-	if( c == '\"' )
+	if (c == '\"')
 	{
 		data++;
-		while( 1 )
+		while (1)
 		{
 			c = (byte)*data;
 
 			// unexpected line end
-			if( !c )
+			if (!c)
 			{
 				token[len] = 0;
 				return data;
 			}
 			data++;
 
-			if( c == '\\' && *data == '"' )
+			if (c == '\\' && *data == '"')
 			{
 				token[len++] = *data++;
 				continue;
 			}
 
-			if( c == '\"' )
+			if (c == '\"')
 			{
 				token[len] = 0;
 				return data;
@@ -90,7 +90,7 @@ skipwhite:
 	}
 
 	// parse single characters
-	if( c == '{' || c == '}' || c == ')' || c == '(' || c == '\'' || c == ',' )
+	if (c == '{' || c == '}' || c == ')' || c == '(' || c == '\'' || c == ',')
 	{
 		token[len] = c;
 		len++;
@@ -106,9 +106,9 @@ skipwhite:
 		len++;
 		c = ((byte)*data);
 
-		if( c == '{' || c == '}' || c == ')' || c == '(' || c == '\'' || c == ',' )
+		if (c == '{' || c == '}' || c == ')' || c == '(' || c == '\'' || c == ',')
 			break;
-	} while( c > 32 );
+	} while (c > 32);
 
 	token[len] = 0;
 
@@ -437,7 +437,7 @@ Con_Printf
 
 =============
 */
-void GAME_EXPORT Con_Printf( char *szFmt, ... )
+void GAME_EXPORT Con_Printf( const char *szFmt, ... )
 {
 	static char	buffer[16384];	// must support > 1k messages
 	va_list		args;
@@ -458,7 +458,7 @@ Con_DPrintf
 
 =============
 */
-void GAME_EXPORT Con_DPrintf( char *szFmt, ... )
+void GAME_EXPORT Con_DPrintf( const char *szFmt, ... )
 {
 	static char	buffer[16384];	// must support > 1k messages
 	va_list		args;

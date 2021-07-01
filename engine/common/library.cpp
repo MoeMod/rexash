@@ -773,7 +773,7 @@ static int BuildImportTable( MEMORYMODULE *module )
 				break;
 			}
 
-			module->modules = (void *)Mem_Realloc( host.mempool, module->modules, (module->numModules + 1) * (sizeof( void* )));
+			module->modules = (void**)Mem_Realloc(host.mempool, module->modules, (module->numModules + 1) * (sizeof(void*)));
 			module->modules[module->numModules++] = handle;
 
 			if( importDesc->OriginalFirstThunk )
@@ -924,7 +924,7 @@ void *MemoryLoadLibrary( const char *name )
 	result->headers->OptionalHeader.ImageBase = (DWORD)code;
 
 	// copy sections from DLL file block to new memory location
-	CopySections( data, old_header, result );
+	CopySections( (const byte*)data, old_header, result );
 
 	// adjust base address of imported data
 	locationDelta = (DWORD)(code - old_header->OptionalHeader.ImageBase);
@@ -1013,7 +1013,8 @@ static void FreeNameFuncGlobals( dll_user_t *hInst )
 
 char *GetMSVCName( const char *in_name )
 {
-	char	*pos, *out_name;
+	const char* pos;
+	char* out_name;
 
 	if( in_name[0] == '?' )  // is this a MSVC C++ mangled name?
 	{
@@ -1165,7 +1166,7 @@ qboolean LibraryLoadSymbols( dll_user_t *hInst )
 		goto table_error;
 	}
 
-	hInst->ordinals = Mem_Alloc( host.mempool, hInst->num_ordinals * sizeof( word ));
+	hInst->ordinals = (word*)Mem_Alloc( host.mempool, hInst->num_ordinals * sizeof( word ));
 
 	if( FS_Read( f, hInst->ordinals, hInst->num_ordinals * sizeof( word )) != (hInst->num_ordinals * sizeof( word )))
 	{
@@ -1181,7 +1182,7 @@ qboolean LibraryLoadSymbols( dll_user_t *hInst )
 		goto table_error;
 	}
 
-	hInst->funcs = Mem_Alloc( host.mempool, hInst->num_ordinals * sizeof( dword ));
+	hInst->funcs = (dword*)Mem_Alloc( host.mempool, hInst->num_ordinals * sizeof( dword ));
 
 	if( FS_Read( f, hInst->funcs, hInst->num_ordinals * sizeof( dword )) != (hInst->num_ordinals * sizeof( dword )))
 	{
@@ -1197,7 +1198,7 @@ qboolean LibraryLoadSymbols( dll_user_t *hInst )
 		goto table_error;
 	}
 
-	p_Names = Mem_Alloc( host.mempool, hInst->num_ordinals * sizeof( dword ));
+	p_Names = (dword*)Mem_Alloc( host.mempool, hInst->num_ordinals * sizeof( dword ));
 
 	if( FS_Read( f, p_Names, hInst->num_ordinals * sizeof( dword )) != (hInst->num_ordinals * sizeof( dword )))
 	{
@@ -1336,7 +1337,8 @@ void *Com_GetProcAddress( void *hInstance, const char *name )
 
 	if( hInst->custom_loader )
 		return (void *)MemoryGetProcAddress( hInst->hInstance, name );
-	return (void *)GetProcAddress( hInst->hInstance, name );
+
+	return (void *)GetProcAddress( (HMODULE)hInst->hInstance, name );
 }
 
 void Com_FreeLibrary( void *hInstance )
@@ -1356,7 +1358,8 @@ void Com_FreeLibrary( void *hInstance )
 	
 	if( hInst->custom_loader )
 		MemoryFreeLibrary( hInst->hInstance );
-	else FreeLibrary( hInst->hInstance );
+	else
+		FreeLibrary((HMODULE)hInst->hInstance );
 
 	hInst->hInstance = NULL;
 

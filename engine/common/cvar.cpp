@@ -116,7 +116,7 @@ int Cvar_VariableInteger( const char *var_name )
 Cvar_VariableString
 ============
 */
-char *GAME_EXPORT Cvar_VariableString( const char *var_name )
+const char *GAME_EXPORT Cvar_VariableString( const char *var_name )
 {
 	convar_t	*var;
 

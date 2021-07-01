@@ -251,7 +251,7 @@ gotnewcl:
 
 	if( Q_strncpy( newcl->useragent, Cmd_Argv( 6 ), MAX_INFO_STRING ) )
 	{
-		char *id = Info_ValueForKey( newcl->useragent, "i" );
+		auto id = Info_ValueForKey( newcl->useragent, "i" );
 
 		if( *id )
 		{
@@ -458,15 +458,14 @@ e.g. ipban
 qboolean SV_ClientConnect( edict_t *ent, char *userinfo )
 {
 	qboolean	result = true;
-	char	*pszName, *pszAddress;
 	char	szRejectReason[MAX_INFO_STRING];
 
 	// make sure we start with known default
 	if( !sv.loadgame ) ent->v.flags = 0;
 	szRejectReason[0] = '\0';
 
-	pszName = Info_ValueForKey( userinfo, "name" );
-	pszAddress = Info_ValueForKey( userinfo, "ip" );
+	auto pszName = Info_ValueForKey( userinfo, "name" );
+	auto pszAddress = Info_ValueForKey( userinfo, "ip" );
 
 	MsgDev( D_NOTE, "SV_ClientConnect()\n" );
 	result = svgame.dllFuncs.pfnClientConnect( ent, pszName, pszAddress, szRejectReason );
@@ -2153,7 +2152,6 @@ static void SV_UserinfoChanged( sv_client_t *cl, const char *userinfo )
 	edict_t		*ent = cl->edict;
 	string		temp1, temp2;
 	sv_client_t	*current;
-	char		*val;
 	const char *model;
 
 	if( !userinfo || !userinfo[0] ) return; // ignored
@@ -2162,7 +2160,7 @@ static void SV_UserinfoChanged( sv_client_t *cl, const char *userinfo )
 
 	Q_strncpy( cl->userinfo, userinfo, sizeof( cl->userinfo ));
 
-	val = Info_ValueForKey( cl->userinfo, "name" );
+	auto val = Info_ValueForKey( cl->userinfo, "name" );
 	Q_strncpy( temp2, val, sizeof( temp2 ));
 	TrimSpace( temp2, temp1 );
 
@@ -2742,7 +2740,7 @@ void SV_EntFire_f( sv_client_t *cl )
 	}
 	else if( ( single = ( Cmd_Argv( 1 )[0] == '!') ) ) // Check for correct instanse with !(num)_(serial)
 	{
-		char *cmd = Cmd_Argv( 1 ) + 1;
+		const char *cmd = Cmd_Argv( 1 ) + 1;
 		i = Q_atoi( cmd );
 
 		while( isdigit( *cmd ) ) cmd++;
@@ -3367,7 +3365,7 @@ connectionless packets.
 void SV_ConnectionlessPacket( netadr_t from, sizebuf_t *msg )
 {
 	char	*args;
-	char	*c, buf[MAX_SYSPATH];
+	char	buf[MAX_SYSPATH];
 	int	len = sizeof( buf );
 
 	// prevent flooding from banned address
@@ -3380,7 +3378,7 @@ void SV_ConnectionlessPacket( netadr_t from, sizebuf_t *msg )
 	args = BF_ReadStringLine( msg );
 	Cmd_TokenizeString( args );
 
-	c = Cmd_Argv( 0 );
+	auto c = Cmd_Argv( 0 );
 	MsgDev( D_NOTE, "SV_ConnectionlessPacket: %s : %s\n", NET_AdrToString( from ), c );
 
 	if( !Q_strcmp( c, "ping" )) SV_Ping( from );

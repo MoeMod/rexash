@@ -360,13 +360,13 @@ void SV_ReadPackets( void )
 			// check for rcon here
 			if( BF_GetMaxBytes( &net_message ) >= 4 && *(int *)net_message.pData == -1 )
 			{
-				char *args, *c;
+				char *args;
 				BF_Clear( &net_message  );
 				BF_ReadLong( &net_message  );// skip the -1 marker
 
 				args = BF_ReadStringLine( &net_message  );
 				Cmd_TokenizeString( args );
-				c = Cmd_Argv( 0 );
+				auto c = Cmd_Argv( 0 );
 
 				if( !Q_strcmp( c, "rcon" ))
 					SV_RemoteCommand( net_from, &net_message );
@@ -819,10 +819,10 @@ SV_ProcessUserAgent
 send error message and return false on wrong input devices
 ====================
 */
-qboolean SV_ProcessUserAgent( netadr_t from, char *useragent )
+qboolean SV_ProcessUserAgent( netadr_t from, const char *useragent )
 {
-	char *input_devices_str = Info_ValueForKey( useragent, "d" );
-	char *id = Info_ValueForKey( useragent, "i" );
+	auto input_devices_str = Info_ValueForKey( useragent, "d" );
+	auto id = Info_ValueForKey( useragent, "i" );
 
 	if( !sv_allow_noinputdevices->integer && ( !input_devices_str || !input_devices_str[0] ) )
 	{
@@ -1030,7 +1030,7 @@ not just stuck on the outgoing message list, because the server is going
 to totally exit after returning from this function.
 ==================
 */
-void SV_FinalMessage( char *message, qboolean reconnect )
+void SV_FinalMessage( const char *message, bool reconnect )
 {
 	sv_client_t	*cl;
 	byte		msg_buf[1024];

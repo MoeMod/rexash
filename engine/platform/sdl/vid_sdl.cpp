@@ -464,9 +464,9 @@ rserr_t R_ChangeDisplaySettings( int width, int height, qboolean fullscreen )
 			return rserr_invalid_fullscreen;
 		SDL_RestoreWindow( host.hWnd );
 #if SDL_VERSION_ATLEAST( 2, 0, 5 )
-		SDL_SetWindowResizable( host.hWnd, true );
+		SDL_SetWindowResizable( host.hWnd, (SDL_bool)true );
 #endif
-		SDL_SetWindowBordered( host.hWnd, true );
+		SDL_SetWindowBordered( host.hWnd, (SDL_bool)true );
 		SDL_SetWindowSize( host.hWnd, width, height );
 		GL_GetDrawableSize( host.hWnd, &width, &height );
 		R_ChangeDisplaySettingsFast( width, height );

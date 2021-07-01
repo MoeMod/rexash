@@ -106,7 +106,6 @@ void Log_Open( void )
 
 	int i;
 	file_t *fp;
-	char *temp;
 
 	if ( !svs.log.active || ( sv_log_onefile->integer != 0 && svs.log.file ) )
 		return;
@@ -119,7 +118,7 @@ void Log_Open( void )
 		time( &ltime );
 		today = localtime( &ltime );
 
-		temp = Cvar_VariableString( "logsdir" );
+		auto temp = Cvar_VariableString( "logsdir" );
 
 		if ( !temp || Q_strlen(temp) <= 0 || Q_strstr( temp, ":" ) || Q_strstr( temp, ".." ) )
 			Q_snprintf( file_base, sizeof( file_base ), "logs/L%02i%02i", today->tm_mon + 1, today->tm_mday );

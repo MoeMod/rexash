@@ -507,7 +507,7 @@ Sys_GetParmFromCmdLine
 Returns the argument for specified parm
 ================
 */
-qboolean _Sys_GetParmFromCmdLine( char *parm, char *out, size_t size )
+qboolean _Sys_GetParmFromCmdLine( const char *parm, char *out, size_t size )
 {
 	int	argc = Sys_CheckParm( parm );
 

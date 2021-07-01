@@ -51,7 +51,7 @@ CL_InitTempents
 */
 void CL_InitTempEnts( void )
 {
-	cl_tempents = Mem_Alloc( cls.mempool, sizeof( TEMPENTITY ) * GI->max_tents );
+	cl_tempents = (TEMPENTITY*)Mem_Alloc( cls.mempool, sizeof( TEMPENTITY ) * GI->max_tents );
 	CL_ClearTempEnts();
 }
 
@@ -1585,7 +1585,7 @@ CL_Explosion
 Create an explosion (scale is magnitude)
 ==============
 */
-void GAME_EXPORT CL_Explosion( vec3_t pos, int model, float scale, float framerate, int flags )
+void GAME_EXPORT CL_Explosion( const vec3_t pos, int model, float scale, float framerate, int flags )
 {
 	TEMPENTITY	*pTemp;
 	sound_t		hSound;
@@ -1679,7 +1679,7 @@ CL_FireField
 Makes a field of fire
 ==============
 */
-void GAME_EXPORT CL_FireField( float *org, int radius, int modelIndex, int count, int flags, float life )
+void GAME_EXPORT CL_FireField( const float *org, int radius, int modelIndex, int count, int flags, float life )
 {
 	TEMPENTITY	*pTemp;
 	float		radius2;
@@ -2610,7 +2610,7 @@ CL_DecalShoot
 normal temporary decal
 ===============
 */
-void GAME_EXPORT CL_DecalShoot( int textureIndex, int entityIndex, int modelIndex, float *pos, int flags )
+void GAME_EXPORT CL_DecalShoot( int textureIndex, int entityIndex, int modelIndex, const float *pos, int flags )
 {
 	R_DecalShoot( textureIndex, entityIndex, modelIndex, pos, flags, NULL, 1.0f );
 }
@@ -2622,7 +2622,7 @@ CL_FireCustomDecal
 custom temporary decal
 ===============
 */
-void GAME_EXPORT CL_FireCustomDecal( int textureIndex, int entityIndex, int modelIndex, float *pos, int flags, float scale )
+void GAME_EXPORT CL_FireCustomDecal( int textureIndex, int entityIndex, int modelIndex, const float *pos, int flags, float scale )
 {
 	R_DecalShoot( textureIndex, entityIndex, modelIndex, pos, flags, NULL, scale );
 }

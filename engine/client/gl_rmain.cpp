@@ -204,10 +204,10 @@ R_WorldToScreen
 Convert a given point from world into screen space
 ===============
 */
-qboolean GAME_EXPORT R_WorldToScreen( const vec3_t point, vec3_t screen )
+bool GAME_EXPORT R_WorldToScreen( const vec3_t point, vec3_t screen )
 {
 	matrix4x4	worldToScreen;
-	qboolean	behind;
+	bool	behind;
 	float	w;
 
 	if( !point || !screen )
@@ -811,12 +811,12 @@ static void R_SetupFrame( void )
 	R_RunViewmodelEvents();
 
 	// sort opaque entities by model type to avoid drawing model shadows under alpha-surfaces
-	qsort( tr.solid_entities, tr.num_solid_entities, sizeof( cl_entity_t* ), (void*)R_SolidEntityCompare );
+	qsort( tr.solid_entities, tr.num_solid_entities, sizeof( cl_entity_t* ), (_CoreCrtNonSecureSearchSortCompareFunction)R_SolidEntityCompare );
 
 	if( !gl_nosort->integer )
 	{
 		// sort translucents entities by rendermode and distance
-		qsort( tr.trans_entities, tr.num_trans_entities, sizeof( cl_entity_t* ), (void*)R_TransEntityCompare );
+		qsort( tr.trans_entities, tr.num_trans_entities, sizeof( cl_entity_t* ), (_CoreCrtNonSecureSearchSortCompareFunction)R_TransEntityCompare );
 	}
 
 	// current viewleaf
@@ -1663,20 +1663,20 @@ static render_api_t gRenderAPI =
 	GL_TextureName,
 	GL_TextureData,
 	GL_LoadTextureNoFilter,
-	(void*)GL_CreateTexture,
+	(int (*)(const char* name, int width, int height, const void* buffer, int flags))GL_CreateTexture,
 	GL_SetTextureType,
 	GL_TextureUpdateCache,
 	GL_FreeTexture,
 	DrawSingleDecal,
 	R_DecalSetupVerts,
 	R_EntityRemoveDecals,
-	(void*)AVI_LoadVideoNoSound,
-	(void*)AVI_GetVideoInfo,
-	(void*)AVI_GetVideoFrameNumber,
-	(void*)AVI_GetVideoFrame,
+	(void* (*)(const char* filename, bool ignore_hwgamma))AVI_LoadVideoNoSound,
+	(int (*)(void*, long*, long*, float*))AVI_GetVideoInfo,
+	(long (*)(void*, float))AVI_GetVideoFrameNumber,
+	(byte* (*)(void*, long))AVI_GetVideoFrame,
 	R_UploadStretchRaw,
-	(void*)AVI_FreeVideo,
-	(void*)AVI_IsActive,
+	(void (*)(void*))AVI_FreeVideo,
+	(int (*)(void*))AVI_IsActive,
 	GL_Bind,
 	GL_SelectTexture,
 	GL_LoadTexMatrixExt,
@@ -1690,7 +1690,7 @@ static render_api_t gRenderAPI =
 	NULL,
 	GL_Scissor,
 	CL_DrawParticlesExternal,
-	(void*)R_EnvShot,
+	R_EnvShot,
 	COM_CompareFileTime,
 	Host_Error,
 	pfnSPR_LoadExt,
@@ -1698,7 +1698,7 @@ static render_api_t gRenderAPI =
 	R_StudioGetTexture,
 	GL_GetOverviewParms,
 	S_FadeMusicVolume,
-	(void*)COM_SetRandomSeed,
+	(void (*)(long))COM_SetRandomSeed,
 	R_Mem_Alloc,
 	R_Mem_Free,
 	pfnGetFilesList,

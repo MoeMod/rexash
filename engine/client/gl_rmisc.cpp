@@ -362,7 +362,7 @@ void R_ParseTexFilters( const char *filename )
 
 		// reading flags
 		pfile = COM_ParseFile( pfile, token );
-		filter.flags = Q_atoi( token );
+		filter.flags = (flFlags_t)Q_atoi( token );
 
 		// make sure what factor is not zeroed
 		if( filter.factor == 0.0f )
@@ -387,7 +387,7 @@ void R_ParseTexFilters( const char *filename )
 			continue;	// already specified
 
 		// allocate new texfilter
-		tf = Z_Malloc( sizeof( dfilter_t ));
+		tf = (dfilter_t*)Z_Malloc( sizeof( dfilter_t ));
 		tex_filters[num_texfilters++] = tf;
 
 		Q_strncpy( tf->texname, texname, sizeof( tf->texname ));

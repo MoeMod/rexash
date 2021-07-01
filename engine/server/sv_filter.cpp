@@ -153,7 +153,7 @@ qboolean SV_CheckIP( netadr_t *addr )
 void SV_BanID_f( void )
 {
 	float time = Q_atof( Cmd_Argv( 1 ) );
-	char *id = Cmd_Argv( 2 );
+	auto id = Cmd_Argv( 2 );
 	sv_client_t *cl = NULL;
 	cidfilter_t *filter;
 
@@ -212,7 +212,7 @@ void SV_BanID_f( void )
 
 	SV_RemoveID( id );
 
-	filter = Mem_Alloc( host.mempool, sizeof( cidfilter_t ) );
+	filter = (cidfilter_t *)Mem_Alloc( host.mempool, sizeof( cidfilter_t ) );
 	filter->endTime = time;
 	filter->next = cidfilter;
 	Q_strncpy( filter->id, id, sizeof( filter->id ) );
@@ -242,7 +242,7 @@ void SV_ListID_f( void )
 }
 void SV_RemoveID_f( void )
 {
-	char *id = Cmd_Argv( 1 );
+	auto id = Cmd_Argv( 1 );
 
 	if( id[0] == '#' && svs.clients )
 	{
@@ -339,8 +339,8 @@ end:
 void SV_AddIP_f( void )
 {
 	float time = Q_atof( Cmd_Argv( 1 ) );
-	char *ipstr = Cmd_Argv( 2 );
-	char *maskstr = Cmd_Argv( 3 );
+	auto ipstr = Cmd_Argv( 2 );
+	auto maskstr = Cmd_Argv( 3 );
 	uint ip, mask;
 	ipfilter_t *filter;
 
@@ -355,7 +355,7 @@ void SV_AddIP_f( void )
 
 	SV_RemoveIP( ip, mask );
 
-	filter = Mem_Alloc( host.mempool, sizeof( ipfilter_t ) );
+	filter = (ipfilter_t*)Mem_Alloc( host.mempool, sizeof( ipfilter_t ) );
 	filter->endTime = time;
 	filter->ip = ip;
 	filter->mask = mask;

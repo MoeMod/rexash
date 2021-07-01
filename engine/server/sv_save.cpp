@@ -41,7 +41,7 @@ half-life implementation of saverestore system
 #define LUMP_MUSIC_OFFSET		3
 #define NUM_CLIENT_OFFSETS		4
 
-void (__cdecl *pfnSaveGameComment)( char *buffer, int max_length ) = NULL;
+void (__cdecl *pfnSaveGameComment)( char *buffer, int max_length ) = nullptr;
 
 typedef struct
 {
@@ -171,7 +171,7 @@ int SumBytes( SaveFileSectionsInfo_t *section )
 
 void SV_InitSaveRestore( void )
 {
-	pfnSaveGameComment = Com_GetProcAddress( svgame.hInstance, "SV_SaveGameComment" );
+	*(void**)&pfnSaveGameComment = Com_GetProcAddress( svgame.hInstance, "SV_SaveGameComment" );
 }
 
 /*
@@ -778,7 +778,7 @@ SAVERESTOREDATA *SV_SaveInit( int size )
 	if( size <= 0 ) size = 0x200000;	// Reserve 2Mb for now
 	numents = svgame.numEntities;
 
-	pSaveData = Mem_Alloc( host.mempool, sizeof(SAVERESTOREDATA) + ( sizeof(ENTITYTABLE) * numents ) + size );
+	pSaveData = (SAVERESTOREDATA*)Mem_Alloc( host.mempool, sizeof(SAVERESTOREDATA) + ( sizeof(ENTITYTABLE) * numents ) + size );
 	SaveRestore_Init( pSaveData, (char *)(pSaveData + 1), size ); // skip the save structure
 	SaveRestore_InitSymbolTable( pSaveData, (char **)Mem_Alloc( host.mempool, nTokens * sizeof( char* )), nTokens );
 
@@ -905,7 +905,7 @@ SAVERESTOREDATA *SV_LoadSaveData( const char *level )
 	// Read the sections info and the data
 	FS_Read( pFile, &sectionsInfo, sizeof( sectionsInfo ));
 
-	pSaveData = Mem_Alloc( host.mempool, sizeof(SAVERESTOREDATA) + SumBytes( &sectionsInfo ));
+	pSaveData = (SAVERESTOREDATA*)Mem_Alloc( host.mempool, sizeof(SAVERESTOREDATA) + SumBytes( &sectionsInfo ));
 	Q_strncpy( pSaveData->szCurrentMapName, level, sizeof( pSaveData->szCurrentMapName ));
 	
 	FS_Read( pFile, (char *)(pSaveData + 1), SumBytes( &sectionsInfo ));
@@ -1458,7 +1458,7 @@ SAVERESTOREDATA *SV_SaveGameState( void )
 
 	numents = svgame.numEntities;
 
-	SaveRestore_InitEntityTable( pSaveData, Mem_Alloc( host.mempool, sizeof(ENTITYTABLE) * numents ), numents );
+	SaveRestore_InitEntityTable( pSaveData, (ENTITYTABLE *)Mem_Alloc( host.mempool, sizeof(ENTITYTABLE) * numents ), numents );
 
 	// Build the adjacent map list (after entity table build by game in presave)
 	svgame.dllFuncs.pfnParmsChangeLevel();
@@ -2080,7 +2080,7 @@ int SV_SaveReadHeader( file_t *pFile, GAME_HEADER *pHeader, int readGlobalState 
 	FS_Read( pFile, &tokenCount, sizeof( int ));
 	FS_Read( pFile, &tokenSize, sizeof( int ));
 
-	pSaveData = Mem_Alloc( host.mempool, sizeof( SAVERESTOREDATA ) + tokenSize + size );
+	pSaveData = (SAVERESTOREDATA*)Mem_Alloc( host.mempool, sizeof( SAVERESTOREDATA ) + tokenSize + size );
 	pSaveData->connectionCount = 0;
 	pszTokenList = (char *)(pSaveData + 1);
 
@@ -2380,7 +2380,7 @@ qboolean SV_GetComment( const char *savename, char *comment )
 	pData = pSaveData;
 
 	// allocate a table for the strings, and parse the table
-	pTokenList = Mem_Alloc( host.mempool, tokenCount * sizeof( char* ));
+	pTokenList = (char**)Mem_Alloc( host.mempool, tokenCount * sizeof( char* ));
 
 	if( !pTokenList || !pSaveData )
 	{

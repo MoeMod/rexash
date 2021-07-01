@@ -1654,9 +1654,7 @@ void S_PlayVol_f( void )
 
 void S_Say_f( void )
 {
-
 	static char buf[1024];
-	char *text;
 
 	if( Cmd_Argc() == 1 )
 	{
@@ -1666,7 +1664,7 @@ void S_Say_f( void )
 
 	if( !dma.initialized ) return;
 
-	text = Cmd_Argv( 1 );
+	auto text = Cmd_Argv( 1 );
 
 	if( text[0] != '!' )
 	{
@@ -1679,7 +1677,6 @@ void S_Say_f( void )
 void S_SayReliable_f( void )
 {
 	static char buf[1024];
-	char *text;
 
 	if( Cmd_Argc() == 1 )
 	{
@@ -1689,7 +1686,7 @@ void S_SayReliable_f( void )
 
 	if( !dma.initialized ) return;
 
-	text = Cmd_Argv( 1 );
+	auto text = Cmd_Argv( 1 );
 
 	if( text[0] != '!' )
 	{

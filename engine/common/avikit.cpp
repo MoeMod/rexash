@@ -726,7 +726,7 @@ movie_state_t *AVI_LoadVideo( const char *filename, qboolean load_audio, qboolea
 #endif
 }
 
-movie_state_t *AVI_LoadVideoNoSound( const char *filename, qboolean ignore_hwgamma )
+movie_state_t *AVI_LoadVideoNoSound( const char *filename, bool ignore_hwgamma )
 {
 	return AVI_LoadVideo( filename, false, ignore_hwgamma );
 }

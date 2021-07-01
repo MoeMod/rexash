@@ -817,7 +817,7 @@ static void R_DecalNode( model_t *model, mnode_t *node, decalinfo_t *decalinfo )
 }
 
 // Shoots a decal onto the surface of the BSP.  position is the center of the decal in world coords
-void R_DecalShoot( int textureIndex, int entityIndex, int modelIndex, vec3_t pos, int flags, vec3_t saxis, float scale )
+void R_DecalShoot( int textureIndex, int entityIndex, int modelIndex, const vec3_t pos, int flags, const vec3_t saxis, float scale )
 {
 	decalinfo_t	decalInfo;
 	hull_t		*hull;

@@ -137,7 +137,7 @@ static void SDLash_KeyEvent( SDL_KeyboardEvent key, int down )
 			return;
 		}
 		default:
-			if( down ) MsgDev( D_INFO, "SDLash_KeyEvent: Unknown key: %s = %i\n", SDL_GetScancodeName( keynum ), keynum );
+			if( down ) MsgDev( D_INFO, "SDLash_KeyEvent: Unknown key: %s = %i\n", SDL_GetScancodeName( (SDL_Scancode)keynum ), keynum );
 			return;
 		}
 	}

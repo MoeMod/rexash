@@ -2403,7 +2403,7 @@ pfnClientCommand
 
 =========
 */
-void GAME_EXPORT pfnClientCommand( edict_t* pEdict, char* szFmt, ... )
+void GAME_EXPORT pfnClientCommand( edict_t* pEdict, const char* szFmt, ... )
 {
 	sv_client_t	*client;
 	string		buffer;
@@ -2852,7 +2852,7 @@ pfnAlertMessage
 
 =============
 */
-static void GAME_EXPORT pfnAlertMessage( ALERT_TYPE level, char *szFmt, ... )
+static void GAME_EXPORT pfnAlertMessage( ALERT_TYPE level, const char *szFmt, ... )
 {
 	char	buffer0[2048];	// must support > 1k messages
 	va_list	args;
@@ -2921,7 +2921,7 @@ pfnEngineFprintf
 legacy. probably was a part of early save\restore system
 =============
 */
-static void GAME_EXPORT pfnEngineFprintf( FILE *pfile, char *szFmt, ... )
+static void GAME_EXPORT pfnEngineFprintf( FILE *pfile, const char *szFmt, ... )
 {
 	char	buffer[2048];
 	va_list	args;
@@ -3922,7 +3922,7 @@ pfnSetClientKeyValue
 
 =============
 */
-void GAME_EXPORT pfnSetClientKeyValue( int clientIndex, char *infobuffer, char *key, char *value )
+void GAME_EXPORT pfnSetClientKeyValue( int clientIndex, char *infobuffer, const char *key, const char *value )
 {
 	clientIndex -= 1;
 
@@ -4658,7 +4658,7 @@ pfnGetFileSize
 returns the filesize in bytes
 =============
 */
-int GAME_EXPORT pfnGetFileSize( char *filename )
+int GAME_EXPORT pfnGetFileSize( const char *filename )
 {
 	return FS_FileSize( filename, false );
 }
@@ -4742,7 +4742,7 @@ pfnCheckParm
 
 =============
 */
-static int GAME_EXPORT pfnCheckParm( char *parm, char **ppnext )
+static int GAME_EXPORT pfnCheckParm( const char *parm, const char **ppnext )
 {
 	int i = Sys_CheckParm( parm );
 
@@ -4759,13 +4759,13 @@ static int GAME_EXPORT pfnCheckParm( char *parm, char **ppnext )
 // engine callbacks
 static enginefuncs_t gEngfuncs = 
 {
-	(void*)pfnPrecacheModel,
-	(void*)SV_SoundIndex,
+	pfnPrecacheModel,
+	SV_SoundIndex,
 	pfnSetModel,
 	pfnModelIndex,
 	pfnModelFrames,
 	pfnSetSize,	
-	(void*)pfnChangeLevel,
+	pfnChangeLevel,
 	pfnGetSpawnParms,
 	pfnSaveSpawnParms,
 	pfnVecToYaw,
@@ -4798,11 +4798,11 @@ static enginefuncs_t gEngfuncs =
 	pfnTraceTexture,
 	pfnTraceSphere,
 	pfnGetAimVector,
-	(void*)pfnServerCommand,
+	pfnServerCommand,
 	Cbuf_Execute,
 	pfnClientCommand,
 	pfnParticleEffect,
-	(void*)pfnLightStyle,
+	pfnLightStyle,
 	pfnDecalIndex,
 	pfnPointContents,
 	pfnMessageBegin,
@@ -4817,7 +4817,7 @@ static enginefuncs_t gEngfuncs =
 	pfnWriteEntity,
 	Cvar_RegisterVariable,
 	Cvar_VariableValue,
-	(void*)Cvar_VariableString,
+	Cvar_VariableString,
 	Cvar_SetFloat,
 	Cvar_Set,
 	pfnAlertMessage,
@@ -4837,27 +4837,27 @@ static enginefuncs_t gEngfuncs =
 	pfnRegUserMsg,
 	pfnAnimationAutomove,
 	pfnGetBonePosition,
-	(void*)pfnFunctionFromName,
-	(void*)pfnNameForFunction,
+	pfnFunctionFromName,
+	pfnNameForFunction,
 	pfnClientPrintf,
 	pfnServerPrint,	
-	(void*)Cmd_Args,
-	(void*)Cmd_Argv,
+	Cmd_Args,
+	Cmd_Argv,
 	Cmd_Argc,
 	pfnGetAttachment,
-	(void*)CRC32_Init,
-	(void*)CRC32_ProcessBuffer,
-	(void*)CRC32_ProcessByte,
-	(void*)pfnCRC32_Final,
-	(void*)Com_RandomLong,
+	(void (*)(CRC32_t* pulCRC))CRC32_Init,
+	(void (*)(CRC32_t* pulCRC, void* p, int len))CRC32_ProcessBuffer,
+	(void (*)(CRC32_t* pulCRC, unsigned char ch))CRC32_ProcessByte,
+	(CRC32_t (*)(CRC32_t pulCRC))pfnCRC32_Final,
+	(long (*)(long lLow, long lHigh))Com_RandomLong,
 	Com_RandomFloat,
 	pfnSetView,
 	pfnTime,
 	pfnCrosshairAngle,
-	(void*)COM_LoadFileForMe,
+	COM_LoadFileForMe,
 	COM_FreeFile,
 	pfnEndSection,
-	(void*)COM_CompareFileTime,
+	COM_CompareFileTime,
 	pfnGetGameDir,
 	Cvar_RegisterVariable,
 	pfnFadeClientVolume,
@@ -4866,25 +4866,25 @@ static enginefuncs_t gEngfuncs =
 	pfnRunPlayerMove,
 	pfnNumberOfEntities,
 	pfnGetInfoKeyBuffer,
-	(void*)Info_ValueForKey,
-	(void*)pfnSetKeyValue,
+	Info_ValueForKey,
+	pfnSetKeyValue,
 	pfnSetClientKeyValue,
 	pfnIsMapValid,
 	pfnStaticDecal,
-	(void*)SV_GenericIndex,
+	SV_GenericIndex,
 	pfnGetPlayerUserId,
 	pfnBuildSoundMsg,
 	pfnIsDedicatedServer,
 	pfnCVarGetPointer,
 	pfnGetPlayerWONId,
-	(void*)Info_RemoveKey,
+	Info_RemoveKey,
 	pfnGetPhysicsKeyValue,
 	pfnSetPhysicsKeyValue,
 	pfnGetPhysicsInfoString,
 	pfnPrecacheEvent,
 	SV_PlaybackEventFull,
-	(void*)pfnSetFatPVS,
-	(void*)pfnSetFatPAS,
+	pfnSetFatPVS,
+	pfnSetFatPAS,
 	pfnCheckVisibility,
 	Delta_SetField,
 	Delta_UnsetField,
@@ -4896,10 +4896,10 @@ static enginefuncs_t gEngfuncs =
 	Delta_UnsetFieldByIndex,
 	pfnSetGroupMask,	
 	pfnCreateInstancedBaseline,
-	(void*)Cvar_DirectSet,
+	Cvar_DirectSet,
 	pfnForceUnmodified,
 	pfnGetPlayerStats,
-	(void*)Cmd_AddGameCommand,
+	Cmd_AddGameCommand,
 	pfnVoice_GetClientListening,
 	pfnVoice_SetClientListening,
 	pfnGetPlayerAuthId,
@@ -4986,8 +4986,8 @@ qboolean SV_ParseEdict( char **pfile, edict_t *ent )
 		// release allocated strings
 		for( i = 0; i < numpairs; i++ )
 		{
-			Mem_Free( pkvd[i].szKeyName );
-			Mem_Free( pkvd[i].szValue );
+			Mem_Free((void*)pkvd[i].szKeyName);
+			Mem_Free((void*)pkvd[i].szValue);
 		}
 		return false;
 	}
@@ -4998,8 +4998,8 @@ qboolean SV_ParseEdict( char **pfile, edict_t *ent )
 		{
 			float	flYawAngle = Q_atof( pkvd[i].szValue );
 
-			Mem_Free( pkvd[i].szKeyName ); // will be replace with 'angles'
-			Mem_Free( pkvd[i].szValue );	// release old value, so we don't need these
+			Mem_Free((void*)pkvd[i].szKeyName ); // will be replace with 'angles'
+			Mem_Free((void*)pkvd[i].szValue );	// release old value, so we don't need these
 			pkvd[i].szKeyName = copystring( "angles" );
 
 			if( flYawAngle >= 0.0f )
@@ -5013,7 +5013,7 @@ qboolean SV_ParseEdict( char **pfile, edict_t *ent )
 
 		if( !Q_strcmp( pkvd[i].szKeyName, "light" ))
 		{
-			Mem_Free( pkvd[i].szKeyName );
+			Mem_Free((void*)pkvd[i].szKeyName );
 			pkvd[i].szKeyName = copystring( "light_level" );
 		}
 
@@ -5024,8 +5024,8 @@ qboolean SV_ParseEdict( char **pfile, edict_t *ent )
 		}
 
 		// no reason to keep this data
-		Mem_Free( pkvd[i].szKeyName );
-		Mem_Free( pkvd[i].szValue );
+		Mem_Free((void*)pkvd[i].szKeyName );
+		Mem_Free((void*)pkvd[i].szValue );
 	}
 
 	return true;
@@ -5306,7 +5306,7 @@ qboolean SV_LoadProgs( const char *name )
 	SV_InitSaveRestore ();
 	svgame.globals->maxEntities = GI->max_edicts;
 	svgame.globals->maxClients = sv_maxclients->integer;
-	svgame.edicts = Mem_Alloc( svgame.mempool, sizeof( edict_t ) * svgame.globals->maxEntities );
+	svgame.edicts = (edict_t*)Mem_Alloc( svgame.mempool, sizeof( edict_t ) * svgame.globals->maxEntities );
 	svgame.numEntities = svgame.globals->maxClients + 1; // clients + world
 
 	for( i = 0, e = svgame.edicts; i < svgame.globals->maxEntities; i++, e++ )

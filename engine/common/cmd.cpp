@@ -635,7 +635,7 @@ int GAME_EXPORT Cmd_Argc( void )
 Cmd_Argv
 ============
 */
-char *GAME_EXPORT Cmd_Argv( int arg )
+const char *GAME_EXPORT Cmd_Argv( int arg )
 {
 	if( arg >= cmd_argc )
 		return "";
@@ -647,7 +647,7 @@ char *GAME_EXPORT Cmd_Argv( int arg )
 Cmd_Args
 ============
 */
-char *GAME_EXPORT Cmd_Args( void )
+const char *GAME_EXPORT Cmd_Args( void )
 {
 	return cmd_args;
 }
@@ -687,7 +687,7 @@ cmd_t *GAME_EXPORT Cmd_GetNextFunctionHandle( cmd_t *cmd )
 Cmd_GetName
 ============
 */
-char *GAME_EXPORT Cmd_GetName( cmd_t *cmd )
+const char *GAME_EXPORT Cmd_GetName( cmd_t *cmd )
 {
 	return cmd->name;
 }

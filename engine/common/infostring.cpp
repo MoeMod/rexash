@@ -82,7 +82,7 @@ Searches the string for the given
 key and returns the associated value, or an empty string.
 ===============
 */
-char *GAME_EXPORT Info_ValueForKey( const char *s, const char *key )
+const char *GAME_EXPORT Info_ValueForKey( const char *s, const char *key )
 {
 	char	pkey[MAX_INFO_STRING];
 	static	char value[2][MAX_INFO_STRING]; // use two buffers so compares work without stomping on each other
@@ -120,7 +120,7 @@ char *GAME_EXPORT Info_ValueForKey( const char *s, const char *key )
 	}
 }
 
-qboolean GAME_EXPORT Info_RemoveKey( char *s, const char *key )
+bool GAME_EXPORT Info_RemoveKey( char *s, const char *key )
 {
 	char	*start;
 	char	pkey[MAX_INFO_STRING];

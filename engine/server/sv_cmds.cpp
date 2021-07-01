@@ -107,7 +107,6 @@ Sets sv_client and sv_player to the player with idnum Cmd_Argv(1)
 */
 qboolean SV_SetPlayer( void )
 {
-	char		*s;
 	sv_client_t	*cl;
 	int		i, idnum;
 
@@ -125,7 +124,7 @@ qboolean SV_SetPlayer( void )
 		return true;
 	}
 
-	s = Cmd_Argv( 1 );
+	auto s = Cmd_Argv( 1 );
 
 	// numeric values are just slot numbers
 	if( Q_isdigit( s ) || (s[0] == '-' && Q_isdigit( s + 1 )))
@@ -294,7 +293,7 @@ TODO: Make it more convenient. (Timestamp check, temporary file, ...)
 void SV_Maps_f(void)
 {
 	char mapName[256], *seperator = "-------------------";
-	char *argStr = Cmd_Argv(1); //Substr
+	auto argStr = Cmd_Argv(1); //Substr
 	int listIndex;
 	search_t *mapList;
 
@@ -409,8 +408,6 @@ SV_StartDefaultMap_f
 */
 void SV_StartDefaultMap_f( void )
 {
-	char *defaultmap;
-
 	if( Cmd_Argc() != 1 )
 	{
 		Msg( "Usage: startdefaultmap\n" );
@@ -425,7 +422,7 @@ void SV_StartDefaultMap_f( void )
 	Cbuf_AddText( va( "exec %s\n", Cvar_VariableString( "servercfgfile" )));
 	Cbuf_Execute();
 
-	defaultmap = Cvar_VariableString( "defaultmap" );
+	auto defaultmap = Cvar_VariableString( "defaultmap" );
 	if( !defaultmap[0] )
 		Msg( "Please add \"defaultmap\" cvar with default map name to your server.cfg!\n" );
 	else
@@ -604,7 +601,7 @@ Saves the state of the map just being exited and goes to a new map.
 */
 void SV_ChangeLevel_f( void )
 {
-	char	*spawn_entity, *mapname;
+	char	*spawn_entity;
 	int	flags, c = Cmd_Argc();
 
 	if( c < 2 )
@@ -619,7 +616,7 @@ void SV_ChangeLevel_f( void )
 		return;
 	}
 
-	mapname = Cmd_Argv( 1 );
+	auto mapname = Cmd_Argv( 1 );
 
 	// determine spawn entity classname
 	if( sv_maxclients->integer == 1 )
@@ -707,7 +704,7 @@ Saves the state of the map just being exited and goes to a new map. Force Half-L
 
 void SV_ChangeLevel2_f( void )
 {
-	char	*spawn_entity, *mapname;
+	char	*spawn_entity;
 	int	flags, c = Cmd_Argc();
 
 	if( c < 2 )
@@ -722,7 +719,7 @@ void SV_ChangeLevel2_f( void )
 		return;
 	}
 
-	mapname = Cmd_Argv( 1 );
+	auto mapname = Cmd_Argv( 1 );
 
 	// determine spawn entity classname
 	if( sv_maxclients->integer == 1 )
@@ -988,7 +985,7 @@ SV_ConSay_f
 */
 void SV_ConSay_f( void )
 {
-	char		*p, text[MAX_SYSPATH];
+	char		text[MAX_SYSPATH];
 	sv_client_t	*client;
 	int		i;
 
@@ -1001,7 +998,7 @@ void SV_ConSay_f( void )
 	}
 
 	Q_strncpy( text, "console: ", MAX_SYSPATH );
-	p = Cmd_Args();
+	char* p = const_cast<char*>(Cmd_Args());
 
 	if( *p == '"' )
 	{
@@ -1045,8 +1042,6 @@ void SV_ServerInfo_f( void )
 
 void SV_LocalInfo_f( void )
 {
-	char *value;
-
 	if ( Cmd_Argc( ) > 3 )
 	{
 		Msg( "Usage: localinfo [ <key> [value] ]\n" );
@@ -1061,7 +1056,7 @@ void SV_LocalInfo_f( void )
 	}
 	else if ( Cmd_Argc( ) == 2 )
 	{
-		value = Info_ValueForKey( localinfo, Cmd_Argv( 1 ) );
+		auto value = Info_ValueForKey( localinfo, Cmd_Argv( 1 ) );
 		Msg( "%s: %s\n", Cmd_Argv( 1 ), *value ? value : "Key not exists" );
 		return;
 	}
@@ -1222,7 +1217,7 @@ Reconnect all clients (useful when adding resources)
 */
 void SV_SendReconnect_f( void )
 {
-	char *message = "Reconnect by console request!\n";
+	auto message = "Reconnect by console request!\n";
 
 	if( Cmd_Argc() > 1 )
 		message = Cmd_Argv( 1 );
