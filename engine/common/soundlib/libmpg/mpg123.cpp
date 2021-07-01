@@ -963,8 +963,11 @@ const char *mpg123_plain_strerror( int errcode )
 	}
 }
 
-const char *get_error( mpg123_handle_t *mh )
+const char* get_error(void* mh)
 {
-	if( !mh ) return mpg123_plain_strerror( MPG123_BAD_HANDLE );
-	return mpg123_plain_strerror( mh->err );
+	auto p = (mpg123_handle_t*)mh;
+	if (!mh)
+		return mpg123_plain_strerror(MPG123_BAD_HANDLE);
+
+	return mpg123_plain_strerror(p->err);
 }

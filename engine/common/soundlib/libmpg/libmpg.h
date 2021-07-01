@@ -42,7 +42,7 @@ extern int read_mpeg_stream( void *mpg, char *outbuf, size_t *outsize  );
 extern int get_stream_pos( void *mpg );
 extern int set_stream_pos( void *mpg, int curpos );
 extern void close_decoder( void *mpg );
-const char *get_error( void *mpeg );
+const char* get_error(void* mh);
 
 
 #endif//LIBMPG_H

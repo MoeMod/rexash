@@ -2258,7 +2258,7 @@ HTTP_AddDownload
 Add new download to end of queue
 ===================
 */
-void HTTP_AddDownload(const char* path, int size, qboolean process)
+void HTTP_AddDownload(const char* path, int size, bool process)
 {
 	httpfile_t* httpfile = (httpfile_t*)Mem_Alloc(net_mempool, sizeof(httpfile_t));
 

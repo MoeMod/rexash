@@ -28,9 +28,11 @@ GNU General Public License for more details.
 char szGameDir[128]; // safe place to keep gamedir
 int g_iArgc;
 
+typedef void (*pfnChangeGame)(const char* progname);
+
 void Host_Shutdown( void );
 void *Com_LoadLibrary(char *, int );
-int Host_Main( int szArgc, char **szArgv, const char *szGameDir, int chg, void *callback );
+int Host_Main(int argc, const char** argv, const char* progname, int bChangeGame, pfnChangeGame func);
 
 char **g_pszArgv;
 
@@ -39,7 +41,7 @@ void Launcher_ChangeGame( const char *progname )
 {
 	strncpy( szGameDir, progname, sizeof( szGameDir ) - 1 );
 	Host_Shutdown( );
-	exit( Host_Main( g_iArgc, g_pszArgv, szGameDir, 1, &Launcher_ChangeGame ) );
+	exit( Host_Main( g_iArgc, (const char**)g_pszArgv, szGameDir, 1, &Launcher_ChangeGame ) );
 }
 #ifdef XASH_NOCONHOST
 #include <windows.h>
@@ -98,7 +100,7 @@ int main( int argc, char** argv )
 		IOS_LaunchDialog();
 	}
 #endif
-	return Host_Main( g_iArgc, g_pszArgv, gamedir, 0, &Launcher_ChangeGame );
+	return Host_Main( g_iArgc, (const char**)g_pszArgv, gamedir, 0, &Launcher_ChangeGame );
 }
 
 #endif

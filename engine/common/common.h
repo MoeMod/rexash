@@ -1050,7 +1050,7 @@ int CSCR_WriteGameCVars( file_t *cfg, const char *scriptfilename );
 void Com_EscapeCommand( char *newCommand, const char *oldCommand, int len );
 
 
-void HTTP_AddDownload( char *path, int size, qboolean process );
+void HTTP_AddDownload( const char *path, int size, bool process );
 void HTTP_ResetProcessState ( void );
 void HTTP_Init( void );
 void HTTP_Shutdown( void );
