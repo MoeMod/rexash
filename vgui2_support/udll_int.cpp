@@ -133,9 +133,45 @@ void UI_ShowCursor(int show)
 {
 
 }
-void UI_CharEvent(int key)
+static int utf8charlen(int in)
 {
-	g_pInputInternal->InternalKeyTyped(key);
+	if (in >= 0xF8)
+		return 0;
+	else if (in >= 0xF0)
+		return 4;
+	else if (in >= 0xE0)
+		return 3;
+	else if (in >= 0xC0)
+		return 2;
+	else if (in <= 0x7F)
+		return 1; //ascii
+}
+void UI_CharEvent(int utf8)
+{
+	static int iCharCounter = 0;
+	static int iInputIndex = 0;
+	static char szInput[5] = {};
+
+	if(!iCharCounter)
+	{
+		iCharCounter = utf8charlen(utf8);
+		iInputIndex = 0;
+		szInput[0] = 0;
+	}
+
+	if (!iCharCounter)
+		return;
+	
+	szInput[iInputIndex] = (char)utf8;
+	++iInputIndex;
+	--iCharCounter;
+	if(!iCharCounter)
+	{
+		wchar_t unicode[16] = {};
+		V_UTF8ToUnicode(szInput, unicode, 16);
+		for(int i = 0; unicode[i]; ++i)
+			g_pInputInternal->InternalKeyTyped(unicode[i]);
+	}
 }
 int UI_MouseInRect(void)
 {
