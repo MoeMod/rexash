@@ -100,7 +100,7 @@ void Sys_SetupCrashHandler( void );
 void Sys_RestoreCrashHandler( void );
 void Sys_SetClipboardData( const byte *buffer, size_t size );
 #define Sys_GetParmFromCmdLine( parm, out ) _Sys_GetParmFromCmdLine( parm, out, sizeof( out ))
-qboolean _Sys_GetParmFromCmdLine( char *parm, char *out, size_t size );
+qboolean _Sys_GetParmFromCmdLine( const char *parm, char *out, size_t size );
 void Sys_ShellExecute( const char *path, const char *parms, qboolean exit );
 void Sys_SendKeyEvents( void );
 qboolean Sys_CheckMMX( void );
