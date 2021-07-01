@@ -543,7 +543,7 @@ msurfmesh_t *R_DecalCreateMesh( decalinfo_t *decalinfo, decal_t *pdecal, msurfac
 	numElems = (numVerts - 2) * 3;
 
 	bufSize = sizeof( msurfmesh_t ) + numVerts * sizeof( glvert_t ) + numElems * sizeof( word );
-	buffer = Mem_Alloc( cls.mempool, bufSize );
+	buffer = (byte*)Mem_Alloc(cls.mempool, bufSize);
 
 	mesh = (msurfmesh_t *)buffer;
 	buffer += sizeof( msurfmesh_t );

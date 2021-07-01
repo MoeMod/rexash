@@ -509,14 +509,14 @@ qboolean VID_ScreenShot( const char *filename, int shot_type )
 	int	width = 0, height = 0;
 	qboolean	result;
 
-	r_shot = Mem_Alloc( r_temppool, sizeof( rgbdata_t ));
+	r_shot = (rgbdata_t *)Mem_Alloc( r_temppool, sizeof( rgbdata_t ));
 	r_shot->width = (glState.width + 3) & ~3;
 	r_shot->height = (glState.height + 3) & ~3;
 	r_shot->flags = IMAGE_HAS_COLOR | IMAGE_HAS_ALPHA;
 	r_shot->type = PF_RGBA_32;
 	r_shot->size = r_shot->width * r_shot->height * PFDesc[r_shot->type].bpp;
 	r_shot->palette = NULL;
-	r_shot->buffer = Mem_Alloc( r_temppool, r_shot->size );
+	r_shot->buffer = (byte*)Mem_Alloc( r_temppool, r_shot->size );
 
 	// get screen frame
 	pglPixelStorei(GL_PACK_ALIGNMENT, 1);	// PANDORA, just in case
@@ -596,10 +596,10 @@ qboolean VID_CubemapShot( const char *base, uint size, const float *vieworg, qbo
 	RI.params |= RP_ENVVIEW;	// do not render non-bmodel entities
 
 	// alloc space
-	temp = Mem_Alloc( r_temppool, size * size * 3 );
-	buffer = Mem_Alloc( r_temppool, size * size * 3 * 6 );
-	r_shot = Mem_Alloc( r_temppool, sizeof( rgbdata_t ));
-	r_side = Mem_Alloc( r_temppool, sizeof( rgbdata_t ));
+	temp = (byte*)Mem_Alloc( r_temppool, size * size * 3 );
+	buffer = (byte*)Mem_Alloc( r_temppool, size * size * 3 * 6 );
+	r_shot = (rgbdata_t*)Mem_Alloc( r_temppool, sizeof( rgbdata_t ));
+	r_side = (rgbdata_t*)Mem_Alloc( r_temppool, sizeof( rgbdata_t ));
 
 	// use client vieworg
 	if( !vieworg ) vieworg = cl.refdef.vieworg;

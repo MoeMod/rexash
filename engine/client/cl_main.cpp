@@ -1291,7 +1291,6 @@ Contents allows \n escape character
 void CL_Packet_f( void )
 {
 	char	send[2048];
-	char	*in, *out;
 	int	i, l;
 	netadr_t	adr;
 
@@ -1311,8 +1310,8 @@ void CL_Packet_f( void )
 
 	if( !adr.port ) adr.port = BF_BigShort( PORT_SERVER );
 
-	in = Cmd_Argv( 2 );
-	out = send + 4;
+	auto in = Cmd_Argv( 2 );
+	auto out = send + 4;
 	send[0] = send[1] = send[2] = send[3] = (char)0xff;
 
 	l = Q_strlen( in );
@@ -1407,13 +1406,12 @@ Handle a reply from a netinfo
 */
 void CL_ParseNETInfoMessage( netadr_t from, sizebuf_t *msg )
 {
-	char		*s;
 	net_request_t	*nr;
 	int		i, context, type;
 
 	context = Q_atoi( Cmd_Argv( 1 ));
 	type = Q_atoi( Cmd_Argv( 2 ));
-	s = Cmd_Argv( 3 );
+	auto s = Cmd_Argv( 3 );
 
 	// find a request with specified context
 	for( i = 0; i < MAX_REQUESTS; i++ )
@@ -1425,7 +1423,7 @@ void CL_ParseNETInfoMessage( netadr_t from, sizebuf_t *msg )
 			if( nr->timeout > host.realtime )
 			{
 				// setup the answer
-				nr->resp.response = s;
+				nr->resp.response = (void*)s;
 				nr->resp.remote_address = from;
 				nr->resp.error = NET_SUCCESS;
 				nr->resp.ping = host.realtime - nr->timesend;
@@ -1637,18 +1635,17 @@ Responses to broadcasts, etc
 */
 void CL_ConnectionlessPacket( netadr_t from, sizebuf_t *msg )
 {
-	char	*args;
-	char	*c, buf[MAX_SYSPATH];
+	char	buf[MAX_SYSPATH];
 	int	len = sizeof( buf ), i = 0;
 	netadr_t servadr;
 
 	BF_Clear( msg );
 	BF_ReadLong( msg ); // skip the -1
 
-	args = BF_ReadStringLine( msg );
+	auto args = BF_ReadStringLine( msg );
 
 	Cmd_TokenizeString( args );
-	c = Cmd_Argv( 0 );
+	auto c = Cmd_Argv( 0 );
 
 	MsgDev( D_NOTE, "CL_ConnectionlessPacket: %s : %s\n", NET_AdrToString( from ), c );
 

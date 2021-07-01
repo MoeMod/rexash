@@ -1262,7 +1262,7 @@ Set screen shake
 */
 int CL_ParseScreenShake( const char *pszName, int iSize, void *pbuf )
 {
-	sizebuf_t _msg = { false, pszName, pbuf, 0, iSize * 8 };
+	sizebuf_t _msg = { false, pszName, (byte*)pbuf, 0, iSize * 8 };
 	sizebuf_t *msg = &_msg;
 
 	clgame.shake.amplitude = (float)(word)BF_ReadShort( msg ) * (1.0f / (float)(1U << 12));
@@ -1283,7 +1283,7 @@ Set screen fade
 */
 int CL_ParseScreenFade( const char *pszName, int iSize, void *pbuf )
 {
-	sizebuf_t _msg = { false, pszName, pbuf, 0, iSize * 8 };
+	sizebuf_t _msg = { false, pszName, (byte*)pbuf, 0, iSize * 8 };
 	sizebuf_t *msg = &_msg;
 	float		duration, holdTime, scale;
 	screenfade_t	*sf = &clgame.fade;

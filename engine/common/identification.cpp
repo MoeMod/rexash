@@ -293,7 +293,7 @@ void ID_TestCPUInfo_f( void )
 
 qboolean ID_ProcessFile( bloomfilter_t *value, const char *path )
 {
-	int fd = open( path, O_RDONLY );
+	int fd = open( path, O_RDONLY, 0 );
 	char buffer[256];
 	int ret;
 

@@ -121,9 +121,9 @@ static mobile_engfuncs_t gpMobileEngfuncs =
 	pfnEnableTextInput,
 	Touch_AddClientButton,
 	Touch_AddDefaultButton,
-	(void*)Touch_HideButtons,
+	Touch_HideButtons,
 	Touch_RemoveButton,
-	(void*)Touch_SetClientOnly,
+	Touch_SetClientOnly,
 	Touch_ResetDefaultButtons,
 	pfnDrawScaledCharacter,
 	Sys_Warn,
@@ -134,7 +134,7 @@ static mobile_engfuncs_t gpMobileEngfuncs =
 void Mobile_Init( void )
 {
 	// find a mobility interface
-	pfnMobilityInterface ExportToClient = Com_GetProcAddress(clgame.hInstance, MOBILITY_CLIENT_EXPORT);
+	pfnMobilityInterface ExportToClient = (pfnMobilityInterface)Com_GetProcAddress(clgame.hInstance, MOBILITY_CLIENT_EXPORT);
 
 	gMobileEngfuncs = &gpMobileEngfuncs;
 

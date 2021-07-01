@@ -438,7 +438,7 @@ touch_button_t *Touch_FindFirst( touchbuttonlist_t *list, const char *name )
 	return NULL;
 }
 
-void Touch_SetClientOnly( qboolean state )
+void Touch_SetClientOnly( bool state )
 {
 	touch.clientonly = state;
 	host.mouse_visible = state;
@@ -553,7 +553,7 @@ void Touch_SetCommand( touchbuttonlist_t *list, const char *name, const char *co
 	Q_strncpy( button->command, command, sizeof( button->command ) );
 }
 
-void Touch_HideButtons( const char *name, qboolean hide )
+void Touch_HideButtons( const char *name, bool hide )
 {
 	touch_button_t *button;
 

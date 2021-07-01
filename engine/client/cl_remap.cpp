@@ -190,7 +190,7 @@ void CL_UpdateTexture( mstudiotexture_t *ptexture, int topcolor, int bottomcolor
 		return;
 	}
 
-	index = GL_LoadTextureInternal( glt->name, pic, 0, true );
+	index = GL_LoadTextureInternal( glt->name, pic, (texFlags_t)0, true );
 	FS_FreeImage( pic );
 
 	// restore original palette
@@ -253,7 +253,7 @@ void CL_AllocRemapInfo( int topcolor, int bottomcolor )
 		// e.g. playermodel 'barney' with playermodel 'gordon'
 		if( clgame.remap_info[i] ) CL_FreeRemapInfo( clgame.remap_info[i] ); // free old info
 		size = sizeof( remap_info_t ) + ( sizeof( mstudiotexture_t ) * phdr->numtextures );
-		info = clgame.remap_info[i] = Mem_Alloc( clgame.mempool, size );	
+		info = clgame.remap_info[i] = (remap_info_t *)Mem_Alloc( clgame.mempool, size );
 		info->ptexture = (mstudiotexture_t *)(info + 1); // textures are immediately comes after remap_info
 	}
 	else

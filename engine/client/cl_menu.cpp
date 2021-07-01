@@ -363,7 +363,7 @@ pfnPIC_Load
 
 =========
 */
-static HIMAGE pfnPIC_Load( const char *szPicName, const byte *image_buf, int image_size, int flags )
+static HIMAGE pfnPIC_Load( const char *szPicName, const byte *image_buf, long image_size, long flags )
 {
 	HIMAGE	tx;
 
@@ -984,7 +984,7 @@ static void pfnWriteGameConfig( const char *name )
 // engine callbacks
 static ui_enginefuncs_t gEngfuncs = 
 {
-	(void*)pfnPIC_Load,
+	pfnPIC_Load,
 	GL_FreeImage,
 	pfnPIC_Width,
 	pfnPIC_Height,
@@ -1007,10 +1007,10 @@ static ui_enginefuncs_t gEngfuncs =
 	Cmd_Argc,
 	Cmd_Argv,
 	Cmd_Args,
-	(void*)Con_Printf,
-	(void*)Con_DPrintf,
-	(void*)UI_NPrintf,
-	(void*)UI_NXPrintf,
+	Con_Printf,
+	Con_DPrintf,
+	UI_NPrintf,
+	UI_NXPrintf,
 	pfnPlaySound,
 	UI_DrawLogo,
 	UI_GetLogoWidth,
@@ -1027,10 +1027,10 @@ static ui_enginefuncs_t gEngfuncs =
 	pfnRenderScene,
 	CL_AddEntity,
 	Host_Error,
-	(void*)FS_FileExists,
+	FS_FileExists,
 	pfnGetGameDir,
-	(void*)Cmd_CheckMapsList,
-	(void*)CL_Active,
+	Cmd_CheckMapsList,
+	CL_Active,
 	pfnClientJoin,
 	COM_LoadFileForMe,
 	COM_ParseFile,
@@ -1040,7 +1040,7 @@ static ui_enginefuncs_t gEngfuncs =
 	Key_KeynumToString,
 	Key_GetBinding,
 	Key_SetBinding,
-	(void*)Key_IsDown,
+	Key_IsDown,
 	pfnKeyGetOverstrikeMode,
 	pfnKeySetOverstrikeMode,
 	pfnKeyGetState,
@@ -1049,21 +1049,21 @@ static ui_enginefuncs_t gEngfuncs =
 	pfnGetGameInfo,
 	pfnGetGamesList,
 	pfnGetFilesList,
-	(void*)SV_GetComment,
-	(void*)CL_GetComment,
+	SV_GetComment,
+	CL_GetComment,
 	pfnCheckGameDll,
 	pfnGetClipboardData,
-	(void*)Sys_ShellExecute,
+	Sys_ShellExecute,
 	pfnWriteGameConfig,
 	pfnChangeInstance,
 	pfnStartBackgroundTrack,
 	pfnHostEndGame,
 	Com_RandomFloat,
-	(void*)Com_RandomLong,
-	(void*)IN_SetCursor,
+	(long (*)(long, long))Com_RandomLong,
+	(void (*)(void*))IN_SetCursor,
 	pfnIsMapValid,
 	GL_ProcessTexture,
-	(void*)COM_CompareFileTime,
+	COM_CompareFileTime,
 	VID_GetModeString
 };
 
@@ -1153,7 +1153,7 @@ qboolean UI_LoadProgs( void )
 	// setup gameinfo
 	for( i = 0; i < SI.numgames; i++ )
 	{
-		menu.modsInfo[i] = Mem_Alloc( menu.mempool, sizeof( GAMEINFO ));
+		menu.modsInfo[i] = (GAMEINFO*)Mem_Alloc(menu.mempool, sizeof(GAMEINFO));
 		UI_ConvertGameInfo( menu.modsInfo[i], SI.games[i] );
 	}
 

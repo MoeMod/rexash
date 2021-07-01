@@ -16,10 +16,6 @@ GNU General Public License for more details.
 #ifndef COMMON_H
 #define COMMON_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include "port.h"
 
 #include "backends.h"
@@ -1113,7 +1109,4 @@ byte TextureToGamma( byte b );
 #include <FindDirectory.h>
 #endif
 
-#ifdef __cplusplus
-}
-#endif
 #endif//COMMON_H

@@ -181,7 +181,6 @@ void SCR_NetSpeeds( void )
 {
 	static char	msg[MAX_SYSPATH];
 	int		x, y, height;
-	char		*p, *start, *end;
 	float		time = cl.mtime[0];
 	rgba_t		color;
 
@@ -226,11 +225,12 @@ void SCR_NetSpeeds( void )
 	Con_DrawStringLen( NULL, NULL, &height );
 	MakeRGBA( color, 255, 255, 255, 255 );
 
-	p = start = msg;
+	const char* p = msg;
+	auto start = p;
 
 	do
 	{
-		end = Q_strchr( p, '\n' );
+		auto end = Q_strchr( p, '\n' );
 		if( end ) msg[end-start] = '\0';
 
 		Con_DrawString( x, y, p, color );
@@ -253,7 +253,6 @@ void SCR_RSpeeds( void )
 	if( R_SpeedsMessage( msg, sizeof( msg )))
 	{
 		int	x, y, height;
-		char	*p, *start, *end;
 		rgba_t	color;
 
 		x = scr_width->integer - 340;
@@ -262,10 +261,12 @@ void SCR_RSpeeds( void )
 		Con_DrawStringLen( NULL, NULL, &height );
 		MakeRGBA( color, 255, 255, 255, 255 );
 
-		p = start = msg;
+		const char* p = msg;
+		auto start = p;
+
 		do
 		{
-			end = Q_strchr( p, '\n' );
+			auto end = Q_strchr( p, '\n' );
 			if( end ) msg[end-start] = '\0';
 
 			Con_DrawString( x, y, p, color );

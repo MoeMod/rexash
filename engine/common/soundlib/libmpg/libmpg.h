@@ -16,10 +16,6 @@ GNU General Public License for more details.
 #ifndef LIBMPG_H
 #define LIBMPG_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 // error codes
 #define MP3_ERR		-1
 #define MP3_OK		0
@@ -48,8 +44,5 @@ extern int set_stream_pos( void *mpg, int curpos );
 extern void close_decoder( void *mpg );
 const char *get_error( void *mpeg );
 
-#ifdef __cplusplus
-}
-#endif
 
 #endif//LIBMPG_H

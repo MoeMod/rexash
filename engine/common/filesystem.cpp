@@ -637,7 +637,7 @@ pack_t *FS_LoadPackPAK( const char *packfile, int *error )
 	pack_t		*pack;
 	dpackfile_t	*info;
 
-	packhandle = open( packfile, O_RDONLY|O_BINARY );
+	packhandle = open( packfile, O_RDONLY|O_BINARY, 0 );
 
 #ifndef _WIN32
 	if( packhandle < 0 )
@@ -2170,7 +2170,7 @@ qboolean FS_SysFileExists( const char *path, qboolean caseinsensitive )
 #ifdef _WIN32
 	int desc;
 
-	desc = open( path, O_RDONLY|O_BINARY );
+	desc = open( path, O_RDONLY|O_BINARY, 0 );
 	if( desc < 0 ) return false;
 	close( desc );
 	return true;
