@@ -19,9 +19,7 @@ GNU General Public License for more details.
 #include "imterm/terminal.hpp"
 #include "imterm/terminal_helpers.hpp"
 
-extern "C" {
 #include "client.h"
-}
 
 #include "minmax.h"
 #include <algorithm>
@@ -30,7 +28,7 @@ extern "C" {
 #include <sstream>
 #include <system_error>
 
-extern "C" { extern convar_t* cvar_vars; }
+extern convar_t* cvar_vars;
 typedef struct cmd_s
 {
 	char* name; // must be first, to match cvar_t

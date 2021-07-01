@@ -77,7 +77,7 @@ void CCvarTextEntry::ApplyChanges(bool immediate)
 
 void CCvarTextEntry::Reset()
 {
-	char *value = engine->pfnGetCvarString(m_pszCvarName);
+	auto value = engine->pfnGetCvarString(m_pszCvarName);
 	if (value && value[0])
 	{
 		SetText(value);

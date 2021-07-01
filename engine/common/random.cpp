@@ -28,7 +28,7 @@ static int idum = 0;
 #define EPS		1.2e-7
 #define RNMX		(1.0 - EPS)
 
-void COM_SetRandomSeed( int lSeed )
+void COM_SetRandomSeed( long lSeed )
 {
 	if( lSeed ) idum = lSeed;
 	else idum = -time( NULL );

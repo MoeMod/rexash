@@ -442,7 +442,7 @@ void COptionsSubMultiplayer::InitCrosshairSizeList(CLabeledCommandComboBox *cb)
 	cb->AddItem("#GameUI_Medium", "cl_crosshair_size medium");
 	cb->AddItem("#GameUI_Large", "cl_crosshair_size large");
 
-	char *value = engine->pfnGetCvarString("cl_crosshair_size");
+	auto value = engine->pfnGetCvarString("cl_crosshair_size");
 
 	if (!value)
 		return;
@@ -472,7 +472,7 @@ void COptionsSubMultiplayer::InitCrosshairTypeList(CLabeledCommandComboBox *cb)
 	cb->AddItem("复合型", "cl_crosshair_type 3");
 	cb->AddItem("圆点型", "cl_crosshair_type 4");
 
-	char *value = engine->pfnGetCvarString("cl_crosshair_type");
+	auto value = engine->pfnGetCvarString("cl_crosshair_type");
 
 	if (!value)
 		return;

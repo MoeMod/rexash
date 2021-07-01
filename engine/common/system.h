@@ -16,10 +16,6 @@ GNU General Public License for more details.
 #ifndef SYSTEM_H
 #define SYSTEM_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 
 
 #ifdef __GNUC__
@@ -138,7 +134,4 @@ char *Wcon_Input( void );
 void Msg( const char *pMsg, ... ) _format(1);
 void MsgDev( int level, const char *pMsg, ... ) _format(2);
 
-#ifdef __cplusplus
-}
-#endif
 #endif//SYSTEM_H

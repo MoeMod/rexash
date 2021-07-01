@@ -34,12 +34,9 @@ set(XASH_ENGINE xash) # Lib name
 
 option(XASH_DEDICATED "Enable dedicated build. Servers must choose this." OFF) # Servers must choose this
 option(XASH_SINGLE_BINARY "Don't build game launcher and build engine as executable" ON)
-if(XASH_DEDICATED)
-	option(XASH_SDL "Enable SDL." OFF) # Dedicated servers still can use SDL
-	option(XASH_IMGUI "Enable IMGUI support" OFF)
-else()
+if(NOT XASH_DEDICATED)
 	option(XASH_SDL "Enable SDL." ON)
-	option(XASH_IMGUI "Enable IMGUI support" ON)
+	option(XASH_IMGUI "Enable IMGUI support" OFF)
 endif()
 if(CMAKE_SIZEOF_VOID_P MATCHES "8")
 	option(XASH_64BIT "Enable experimental 64-bit build. Note that you must also provide 64-bit game binaries" ON)

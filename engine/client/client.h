@@ -535,19 +535,10 @@ typedef struct
 extern int		downloadcount;
 extern int		downloadfileid;
 
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 extern client_t		cl;
 extern client_static_t	cls;
 extern clgame_static_t	clgame;
 extern menu_static_t	menu;
-
-#ifdef __cplusplus
-}
-#endif
 
 //
 // cvars

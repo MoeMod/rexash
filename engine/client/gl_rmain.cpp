@@ -13,6 +13,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 */
 
+#include "common/common.h"
 #ifndef XASH_DEDICATED
 
 #include "common.h"
@@ -23,6 +24,8 @@ GNU General Public License for more details.
 #include "beamdef.h"
 #include "particledef.h"
 #include "entity_types.h"
+
+#include <type_traits>
 
 #define IsLiquidContents( cnt )	( cnt == CONTENTS_WATER || cnt == CONTENTS_SLIME || cnt == CONTENTS_LAVA )
 
@@ -204,7 +207,7 @@ R_WorldToScreen
 Convert a given point from world into screen space
 ===============
 */
-bool GAME_EXPORT R_WorldToScreen( const vec3_t point, vec3_t screen )
+qboolean GAME_EXPORT R_WorldToScreen( const vec3_t point, vec3_t screen )
 {
 	matrix4x4	worldToScreen;
 	bool	behind;
@@ -1644,6 +1647,15 @@ static char **pfnGetFilesList( const char *pattern, int *numFiles, int gamediron
 	if( numFiles ) *numFiles = t->numfilenames;
 	return t->filenames;
 }
+
+// transform all void* to movie_state_t*
+template<class T> struct TransformAVIPtrType : std::conditional< std::is_same<void*, T>::value, movie_state_t*, T > {};
+
+template<class Ret, class...Args> struct AVIFunctionPointerWrapper
+{
+	constexpr AVIFunctionPointerWrapper(Ret(*pfn)(Args...)) {}
+	template<Ret(*pfn)(Args...), class RetType = Ret> static constexpr auto lambda = [](auto...args) { return static_cast<RetType>(pfn(static_cast<typename TransformAVIPtrType<decltype(args)>::type>(args)...)); };
+};
 	
 static render_api_t gRenderAPI =
 {
@@ -1663,20 +1675,20 @@ static render_api_t gRenderAPI =
 	GL_TextureName,
 	GL_TextureData,
 	GL_LoadTextureNoFilter,
-	(int (*)(const char* name, int width, int height, const void* buffer, int flags))GL_CreateTexture,
+	GL_CreateTexture,
 	GL_SetTextureType,
 	GL_TextureUpdateCache,
 	GL_FreeTexture,
 	DrawSingleDecal,
 	R_DecalSetupVerts,
 	R_EntityRemoveDecals,
-	(void* (*)(const char* filename, bool ignore_hwgamma))AVI_LoadVideoNoSound,
-	(int (*)(void*, long*, long*, float*))AVI_GetVideoInfo,
-	(long (*)(void*, float))AVI_GetVideoFrameNumber,
-	(byte* (*)(void*, long))AVI_GetVideoFrame,
+	AVIFunctionPointerWrapper(AVI_LoadVideoNoSound).lambda<AVI_LoadVideoNoSound, void *>,
+	AVIFunctionPointerWrapper(AVI_GetVideoInfo).lambda<AVI_GetVideoInfo>,
+	AVIFunctionPointerWrapper(AVI_GetVideoFrameNumber).lambda<AVI_GetVideoFrameNumber>,
+	AVIFunctionPointerWrapper(AVI_GetVideoFrame).lambda<AVI_GetVideoFrame>,
 	R_UploadStretchRaw,
-	(void (*)(void*))AVI_FreeVideo,
-	(int (*)(void*))AVI_IsActive,
+	AVIFunctionPointerWrapper(AVI_FreeVideo).lambda<AVI_FreeVideo>,
+	AVIFunctionPointerWrapper(AVI_IsActive).lambda<AVI_IsActive>,
 	GL_Bind,
 	GL_SelectTexture,
 	GL_LoadTexMatrixExt,
@@ -1698,7 +1710,7 @@ static render_api_t gRenderAPI =
 	R_StudioGetTexture,
 	GL_GetOverviewParms,
 	S_FadeMusicVolume,
-	(void (*)(long))COM_SetRandomSeed,
+	COM_SetRandomSeed,
 	R_Mem_Alloc,
 	R_Mem_Free,
 	pfnGetFilesList,

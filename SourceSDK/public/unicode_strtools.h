@@ -57,14 +57,6 @@ enum EStringConvertErrorPolicy
 	STRINGCONVERT_ASSERT_FAIL = 6,
 };
 
-#if defined(CLIENT_DLL)
-namespace cl {
-#elif defined(SERVER_DLL)
-namespace sv {
-#elif defined(__cplusplus)
-extern "C++" {
-#endif
-
 bool Q_IsValidUChar32(uchar32 uVal);
 int Q_UTF32ToUChar32(const uchar32 *pUTF32, uchar32 &uVal, bool &bErr);
 int Q_UChar32ToUTF32Len(uchar32 uVal);
@@ -92,7 +84,5 @@ qboolean V_UTF8ToUChar32(const char *pUTF8_, uchar32 *uValueOut);
 int Q_UnicodeRepair(char *pUTF8);
 wchar_t *Q_AdvanceSpace(wchar_t *start);
 wchar_t *Q_ReadUToken(wchar_t *start, wchar_t *token, int tokenBufferSize, bool &quoted);
-
-}
 
 #endif // UNICODE_STR_TOOLS_H

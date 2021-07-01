@@ -13,13 +13,11 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 */
 
-extern "C" {
 #include "common.h"
 #include "client.h"
 #include "gl_local.h"
 #include "input.h"
 #include "input_ime.h"
-}
 #include "minmax.h"
 
 #include "imgui.h"
@@ -160,7 +158,7 @@ void ImGui_ImplGL_RenderDrawLists(ImDrawData* draw_data)
 //    1:down 0:up
 //=============
 
-extern "C" { extern qboolean	in_mouseactive; }
+extern qboolean	in_mouseactive;
 qboolean ImGui_ImplGL_MouseButtonCallback(int button, int action)
 {
 	if (!g_EngineContext)
@@ -328,7 +326,7 @@ void ImGui_ImplGL_InvalidateDeviceObjects(void)
 	}
 }
 
-extern "C" int pfnGetScreenInfo( SCREENINFO *pscrinfo );
+int pfnGetScreenInfo( SCREENINFO *pscrinfo );
 
 void ImGui_ImplGL_ReloadFonts()
 {
