@@ -1191,7 +1191,8 @@ void CL_Disconnect( void )
 
 void CL_Disconnect_f( void )
 {
-	Host_Error( "Disconnected from server\n" );
+	CL_Disconnect();
+	//Host_Error( "Disconnected from server\n" );
 }
 
 void CL_Crashed( void )
