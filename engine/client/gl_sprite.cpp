@@ -739,7 +739,7 @@ qboolean R_CullSpriteModel( cl_entity_t *e, vec3_t origin )
 	if( !e->model->cache.data )
 		return true;
 
-	if( e == &clgame.viewent && r_lefthand->integer >= 2 )
+	if( tr.fFlipViewModel )
 		return true;
 
 	if( !R_SpriteComputeBBox( e, NULL ))

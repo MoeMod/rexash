@@ -209,6 +209,7 @@ typedef struct
 	// OpenGL matrix states
 	qboolean		modelviewIdentity;
 	qboolean		fResetVis;
+	qboolean		fFlipViewModel;
 	
 	int		visframecount;	// PVS frame
 	int		dlightframecount;	// dynamic light frame

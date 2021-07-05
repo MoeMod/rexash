@@ -87,6 +87,7 @@ convar_t			*r_studio_drawelements;
 convar_t			*r_drawviewmodel;
 convar_t			*r_customdraw_playermodel;
 convar_t			*cl_himodels;
+convar_t			*cl_righthand;
 cvar_t			r_shadows = { "r_shadows", "0", 0, 0 };	// dead cvar. especially disabled
 cvar_t			r_shadowalpha = { "r_shadowalpha", "0.5", 0, 0.8f };
 static r_studio_interface_t	*pStudioDraw;
@@ -253,6 +254,24 @@ qboolean R_StudioExtractBbox( studiohdr_t *phdr, int sequence, float *mins, floa
 	VectorCopy( pseqdesc[sequence].bbmax, maxs );
 
 	return true;
+}
+
+/*
+================
+R_AllowFlipViewModel
+should a flip the viewmodel if cl_righthand is set to 1
+================
+*/
+static qboolean R_AllowFlipViewModel(cl_entity_t* e)
+{
+	if (cl_righthand && cl_righthand->value > 0)
+	{
+		constexpr int CSW_KNIFE = 29;
+		if (!((e == &clgame.viewent) ^ (cl.frame.client.m_iId != CSW_KNIFE)))
+			return true;
+	}
+
+	return false;
 }
 
 /*
@@ -574,7 +593,7 @@ void R_StudioSetUpTransform( cl_entity_t *e )
 
 	Matrix3x4_CreateFromEntity( g_rotationmatrix, angles, origin, 1.0f );
 
-	if( e == &clgame.viewent && R_LeftHand() )
+	if( tr.fFlipViewModel )
 	{
 		// inverse the right vector (should work in Opposing Force)
 		g_rotationmatrix[0][1] = -g_rotationmatrix[0][1];
@@ -3751,7 +3770,12 @@ void R_DrawViewModel( void )
 	pglDepthRange( gldepthmin, gldepthmin + 0.3f * ( gldepthmax - gldepthmin ));
 
 	// backface culling for left-handed weapons
-	g_iBackFaceCull = R_LeftHand(); // GL_FrontFace is called in SetupStudioRenderer
+	if (R_AllowFlipViewModel(RI.currententity) || g_iBackFaceCull)
+	{
+		tr.fFlipViewModel = true;
+		pglFrontFace(GL_CW);
+	}
+	
 	RI.currententity->curstate.scale = 1.0f;
 	RI.currententity->curstate.frame = 0;
 	RI.currententity->curstate.framerate = 1.0f;
@@ -3765,7 +3789,11 @@ void R_DrawViewModel( void )
 	pglDepthRange( gldepthmin, gldepthmax );
 
 	// backface culling for left-handed weapons
-	g_iBackFaceCull = false; // GL_FrontFace is called in RestoreStudioRenderer
+	if (R_AllowFlipViewModel(RI.currententity) || g_iBackFaceCull)
+	{
+		tr.fFlipViewModel = false;
+		pglFrontFace(GL_CCW);
+	}
 
 	RI.currententity = NULL;
 	RI.currentmodel = NULL;
@@ -4164,6 +4192,12 @@ Initialize client studio
 void CL_InitStudioAPI( void )
 {
 	pStudioDraw = &gStudioDraw;
+
+	// trying to grab them from client.dll
+	cl_righthand = Cvar_FindVar("cl_righthand");
+
+	if (cl_righthand == NULL)
+		cl_righthand = Cvar_Get("cl_righthand", "0", FCVAR_ARCHIVE, "flip viewmodel (left to right)");
 
 	// Xash will be used internal StudioModelRenderer
 	if( !clgame.dllFuncs.pfnGetStudioModelInterface )
