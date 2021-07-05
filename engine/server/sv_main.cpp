@@ -886,7 +886,7 @@ void SV_Init( void )
 	Log_InitCvars();
 
 	skill = Cvar_Get ("skill", "1", CVAR_LATCH, "game skill level" );
-	deathmatch = Cvar_Get ("deathmatch", "0", CVAR_LATCH|CVAR_SERVERINFO, "displays deathmatch state" );
+	deathmatch = Cvar_Get ("deathmatch", SI.GameInfo->gamemode == 2 ? "1" : "0", CVAR_LATCH|CVAR_SERVERINFO, "displays deathmatch state" );
 	teamplay = Cvar_Get ("teamplay", "0", CVAR_LATCH|CVAR_SERVERINFO, "displays teamplay state" );
 	coop = Cvar_Get ("coop", "0", CVAR_LATCH|CVAR_SERVERINFO, "displays cooperative state" );
 	Cvar_Get ("protocol", va( "%i", PROTOCOL_VERSION ), CVAR_INIT, "displays server protocol version" );
