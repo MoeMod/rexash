@@ -3,6 +3,8 @@
 *.so
 *.a
 *.framework
+*.dylib
+*.dll
 
 # Other
 *.save

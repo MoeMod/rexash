@@ -94,7 +94,7 @@ public:
 		TYPE_WSTRING,
 		TYPE_COLOR,
 		TYPE_UINT64,
-		TYPE_NUMTYPES, 
+		TYPE_NUMTYPES,
 	};
 
 	virtual types_t GetDataType(const char *keyName = NULL);
@@ -137,6 +137,7 @@ public:
 	void *operator new(unsigned int iAllfParseIncludedKeysocSize);
 	void *operator new(unsigned int iAllocSize, int nBlockUse, const char *pFileName, int nLine);
 	void operator delete(void *pMem);
+	void operator delete(void* pMem, unsigned int iAllocSize, int nBlockUse, const char* pFileName, int nLine);
 	KeyValues &operator = (KeyValues &src);
 
 private:
@@ -246,6 +247,6 @@ inline bool KeyValues::IsEmpty(int keySymbol)
 	return dat ? dat->IsEmpty() : true;
 }
 
-bool EvaluateConditional( const char *str );
+bool EvaluateConditional(const char *str);
 
 #endif

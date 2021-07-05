@@ -34,12 +34,12 @@ public:
 	virtual const char *GetStringForSymbol(HKeySymbol symbol) = 0;
 	virtual HLocalized GetLocalizedFromANSI(const char *string) = 0;
 	virtual const char *GetANSIFromLocalized(HLocalized l) = 0;
-
+	
 	virtual void AddKeyValuesToMemoryLeakList(void *pMem, HKeySymbol name) = 0;
 	virtual void RemoveKeyValuesFromMemoryLeakList(void *pMem) = 0;
 };
 
-IKeyValuesSystem *KeyValuesSystem(void);
+VSTDLIB_INTERFACE IKeyValuesSystem* KeyValuesSystem();
 
 #define KEYVALUESSYSTEM_INTERFACE_VERSION "KeyValues003"
 

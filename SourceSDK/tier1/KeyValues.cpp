@@ -316,7 +316,7 @@ const char *KeyValues::ReadToken(CUtlBuffer &buf, bool &wasQuoted)
 	wasQuoted = false;
 
 	if (!buf.IsValid())
-		return NULL; 
+		return NULL;
 
 	while (true)
 	{
@@ -438,7 +438,7 @@ void KeyValues::WriteIndents(IFileSystem *filesystem, FileHandle_t f, CUtlBuffer
 void KeyValues::WriteConvertedString(IFileSystem *filesystem, FileHandle_t f, CUtlBuffer *pBuf, const char *pszString)
 {
 	int len = Q_strlen(pszString);
-	char *convertedString = (char *)_alloca ((len + 1) * sizeof(char) * 2);
+	char *convertedString = (char *)_alloca((len + 1) * sizeof(char) * 2);
 	int j = 0;
 
 	for (int i = 0; i <= len; i++)
@@ -472,7 +472,7 @@ void KeyValues::InternalWrite(IFileSystem *filesystem, FileHandle_t f, CUtlBuffe
 	{
 		pBuf->Put(pData, len);
 	}
-} 
+}
 
 void KeyValues::RecursiveSaveToFile(IFileSystem *filesystem, FileHandle_t f, CUtlBuffer *pBuf, int indentLevel)
 {
@@ -493,100 +493,100 @@ void KeyValues::RecursiveSaveToFile(IFileSystem *filesystem, FileHandle_t f, CUt
 		{
 			switch (dat->m_iDataType)
 			{
-				case TYPE_STRING:
+			case TYPE_STRING:
+			{
+				if (dat->m_sValue && *(dat->m_sValue))
 				{
-					if (dat->m_sValue && *(dat->m_sValue))
+					WriteIndents(filesystem, f, pBuf, indentLevel + 1);
+					INTERNALWRITE("\"", 1);
+					WriteConvertedString(filesystem, f, pBuf, dat->GetName());
+					INTERNALWRITE("\"\t\t\"", 4);
+
+					WriteConvertedString(filesystem, f, pBuf, dat->m_sValue);
+
+					INTERNALWRITE("\"\r\n", 3);
+				}
+
+				break;
+			}
+#ifdef _WIN32
+			case TYPE_WSTRING:
+			{
+				if (dat->m_wsValue)
+				{
+					static char buf[KEYVALUES_TOKEN_SIZE];
+
+					assert(::WideCharToMultiByte(CP_UTF8, 0, dat->m_wsValue, -1, NULL, 0, NULL, NULL) < KEYVALUES_TOKEN_SIZE);
+					int result = ::WideCharToMultiByte(CP_UTF8, 0, dat->m_wsValue, -1, buf, KEYVALUES_TOKEN_SIZE, NULL, NULL);
+
+					if (result)
 					{
 						WriteIndents(filesystem, f, pBuf, indentLevel + 1);
 						INTERNALWRITE("\"", 1);
-						WriteConvertedString(filesystem, f, pBuf, dat->GetName());
+						INTERNALWRITE(dat->GetName(), Q_strlen(dat->GetName()));
 						INTERNALWRITE("\"\t\t\"", 4);
 
-						WriteConvertedString(filesystem, f, pBuf, dat->m_sValue);
+						WriteConvertedString(filesystem, f, pBuf, buf);
 
 						INTERNALWRITE("\"\r\n", 3);
 					}
-
-					break;
 				}
-#ifdef _WIN32
-				case TYPE_WSTRING:
-				{
-					if (dat->m_wsValue)
-					{
-						static char buf[KEYVALUES_TOKEN_SIZE];
-
-						assert(::WideCharToMultiByte(CP_UTF8, 0, dat->m_wsValue, -1, NULL, 0, NULL, NULL) < KEYVALUES_TOKEN_SIZE);
-						int result = ::WideCharToMultiByte(CP_UTF8, 0, dat->m_wsValue, -1, buf, KEYVALUES_TOKEN_SIZE, NULL, NULL);
-
-						if (result)
-						{
-							WriteIndents(filesystem, f, pBuf, indentLevel + 1);
-							INTERNALWRITE("\"", 1);
-							INTERNALWRITE(dat->GetName(), Q_strlen(dat->GetName()));
-							INTERNALWRITE("\"\t\t\"", 4);
-
-							WriteConvertedString(filesystem, f, pBuf, buf);
-
-							INTERNALWRITE("\"\r\n", 3);
-						}
-					}
 #endif
-					break;
-				}
+				break;
+			}
 
-				case TYPE_INT:
-				{
-					WriteIndents(filesystem, f, pBuf, indentLevel + 1);
-					INTERNALWRITE("\"", 1);
-					INTERNALWRITE(dat->GetName(), Q_strlen(dat->GetName()));
-					INTERNALWRITE("\"\t\t\"", 4);
+			case TYPE_INT:
+			{
+				WriteIndents(filesystem, f, pBuf, indentLevel + 1);
+				INTERNALWRITE("\"", 1);
+				INTERNALWRITE(dat->GetName(), Q_strlen(dat->GetName()));
+				INTERNALWRITE("\"\t\t\"", 4);
 
-					char buf[32];
-					Q_snprintf(buf, 32, "%d", dat->m_iValue);
+				char buf[32];
+				Q_snprintf(buf, 32, "%d", dat->m_iValue);
 
-					INTERNALWRITE(buf, Q_strlen(buf));
-					INTERNALWRITE("\"\r\n", 3);
-					break;
-				}
+				INTERNALWRITE(buf, Q_strlen(buf));
+				INTERNALWRITE("\"\r\n", 3);
+				break;
+			}
 
-				case TYPE_UINT64:
-				{
-					WriteIndents(filesystem, f, pBuf, indentLevel + 1);
-					INTERNALWRITE("\"", 1);
-					INTERNALWRITE(dat->GetName(), Q_strlen(dat->GetName()));
-					INTERNALWRITE("\"\t\t\"", 4);
+			case TYPE_UINT64:
+			{
+				WriteIndents(filesystem, f, pBuf, indentLevel + 1);
+				INTERNALWRITE("\"", 1);
+				INTERNALWRITE(dat->GetName(), Q_strlen(dat->GetName()));
+				INTERNALWRITE("\"\t\t\"", 4);
 
-					char buf[32];
-					Q_snprintf(buf, sizeof(buf), "0x%016I64X", *((uint64 *)dat->m_sValue));
+				char buf[32];
+				Q_snprintf(buf, sizeof(buf), "0x%016I64X", *((uint64 *)dat->m_sValue));
 
-					INTERNALWRITE(buf, Q_strlen(buf));
-					INTERNALWRITE("\"\r\n", 3);
-					break;
-				}
+				INTERNALWRITE(buf, Q_strlen(buf));
+				INTERNALWRITE("\"\r\n", 3);
+				break;
+			}
 
-				case TYPE_FLOAT:
-				{
-					WriteIndents(filesystem, f, pBuf, indentLevel + 1);
-					INTERNALWRITE("\"", 1);
-					INTERNALWRITE(dat->GetName(), Q_strlen(dat->GetName()));
-					INTERNALWRITE("\"\t\t\"", 4);
+			case TYPE_FLOAT:
+			{
+				WriteIndents(filesystem, f, pBuf, indentLevel + 1);
+				INTERNALWRITE("\"", 1);
+				INTERNALWRITE(dat->GetName(), Q_strlen(dat->GetName()));
+				INTERNALWRITE("\"\t\t\"", 4);
 
-					char buf[48];
-					Q_snprintf(buf, 48, "%f", dat->m_flValue);
+				char buf[48];
+				Q_snprintf(buf, 48, "%f", dat->m_flValue);
 
-					INTERNALWRITE(buf, Q_strlen(buf));
-					INTERNALWRITE("\"\r\n", 3);
-					break;
-				}
+				INTERNALWRITE(buf, Q_strlen(buf));
+				INTERNALWRITE("\"\r\n", 3);
+				break;
+			}
 
-				case TYPE_COLOR:
-				{
-					DevMsg(1, "KeyValues::RecursiveSaveToFile: TODO, missing code for TYPE_COLOR.\n");
-					break;
-				}
+			case TYPE_COLOR:
+			{
+				DevMsg(1, "KeyValues::RecursiveSaveToFile: TODO, missing code for TYPE_COLOR.\n");
+				break;
+			}
 
-				default: break;
+			default: break;
 			}
 		}
 	}
@@ -822,38 +822,38 @@ int KeyValues::GetInt(const char *keyName, int defaultValue)
 	{
 		switch (dat->m_iDataType)
 		{
-			case TYPE_STRING:
-			{
-				return atoi(dat->m_sValue);
-			}
+		case TYPE_STRING:
+		{
+			return atoi(dat->m_sValue);
+		}
 
-			case TYPE_WSTRING:
-			{
+		case TYPE_WSTRING:
+		{
 #ifdef _WIN32
-				return _wtoi(dat->m_wsValue);
+			return _wtoi(dat->m_wsValue);
 #else
 			DevMsg("TODO: implement _wtoi\n");
 			return 0;
 #endif
-			}
+		}
 
-			case TYPE_FLOAT:
-			{
-				return (int)dat->m_flValue;
-			}
+		case TYPE_FLOAT:
+		{
+			return (int)dat->m_flValue;
+		}
 
-			case TYPE_UINT64:
-			{
-				Assert(0);
-				return 0;
-			}
+		case TYPE_UINT64:
+		{
+			Assert(0);
+			return 0;
+		}
 
-			case TYPE_INT:
-			case TYPE_PTR:
-			default:
-			{
-				return dat->m_iValue;
-			}
+		case TYPE_INT:
+		case TYPE_PTR:
+		default:
+		{
+			return dat->m_iValue;
+		}
 		}
 	}
 
@@ -868,38 +868,38 @@ uint64 KeyValues::GetUint64(const char *keyName, uint64 defaultValue)
 	{
 		switch (dat->m_iDataType)
 		{
-			case TYPE_STRING:
-			{
-				return atoi(dat->m_sValue);
-			}
+		case TYPE_STRING:
+		{
+			return atoi(dat->m_sValue);
+		}
 
-			case TYPE_WSTRING:
-			{
+		case TYPE_WSTRING:
+		{
 #ifdef _WIN32
-				return _wtoi(dat->m_wsValue);
+			return _wtoi(dat->m_wsValue);
 #else
-				AssertFatal(0);
-				return 0;
+			AssertFatal(0);
+			return 0;
 #endif
-			}
+		}
 
-			case TYPE_FLOAT:
-			{
-				return (int)dat->m_flValue;
-			}
+		case TYPE_FLOAT:
+		{
+			return (int)dat->m_flValue;
+		}
 
-			case TYPE_UINT64:
-			{
-				return *((uint64 *)dat->m_sValue);
-			}
+		case TYPE_UINT64:
+		{
+			return *((uint64 *)dat->m_sValue);
+		}
 
-			case TYPE_INT:
-			case TYPE_PTR:
+		case TYPE_INT:
+		case TYPE_PTR:
 
-			default:
-			{
-				return dat->m_iValue;
-			}
+		default:
+		{
+			return dat->m_iValue;
+		}
 		}
 	}
 
@@ -914,20 +914,20 @@ void *KeyValues::GetPtr(const char *keyName, void *defaultValue)
 	{
 		switch (dat->m_iDataType)
 		{
-			case TYPE_PTR:
-			{
-				return dat->m_pValue;
-			}
+		case TYPE_PTR:
+		{
+			return dat->m_pValue;
+		}
 
-			case TYPE_WSTRING:
-			case TYPE_STRING:
-			case TYPE_FLOAT:
-			case TYPE_INT:
-			case TYPE_UINT64:
-			default:
-			{
-				return NULL;
-			}
+		case TYPE_WSTRING:
+		case TYPE_STRING:
+		case TYPE_FLOAT:
+		case TYPE_INT:
+		case TYPE_UINT64:
+		default:
+		{
+			return NULL;
+		}
 		}
 	}
 
@@ -942,36 +942,36 @@ float KeyValues::GetFloat(const char *keyName, float defaultValue)
 	{
 		switch (dat->m_iDataType)
 		{
-			case TYPE_STRING:
-			{
-				return (float)atof(dat->m_sValue);
-			}
+		case TYPE_STRING:
+		{
+			return (float)atof(dat->m_sValue);
+		}
 
-			case TYPE_WSTRING:
-			{
-				return 0.0f;
-			}
+		case TYPE_WSTRING:
+		{
+			return 0.0f;
+		}
 
-			case TYPE_FLOAT:
-			{
-				return dat->m_flValue;
-			}
+		case TYPE_FLOAT:
+		{
+			return dat->m_flValue;
+		}
 
-			case TYPE_INT:
-			{
-				return (float)dat->m_iValue;
-			}
+		case TYPE_INT:
+		{
+			return (float)dat->m_iValue;
+		}
 
-			case TYPE_UINT64:
-			{
-				return (float)(*((uint64 *)dat->m_sValue));
-			}
+		case TYPE_UINT64:
+		{
+			return (float)(*((uint64 *)dat->m_sValue));
+		}
 
-			case TYPE_PTR:
-			default:
-			{
-				return 0.0f;
-			}
+		case TYPE_PTR:
+		default:
+		{
+			return 0.0f;
+		}
 		}
 	}
 
@@ -988,55 +988,55 @@ const char *KeyValues::GetString(const char *keyName, const char *defaultValue)
 
 		switch (dat->m_iDataType)
 		{
-			case TYPE_FLOAT:
-			{
-				Q_snprintf(buf, 64, "%f", dat->m_flValue);
-				SetString(keyName, buf);
-				break;
-			}
+		case TYPE_FLOAT:
+		{
+			Q_snprintf(buf, 64, "%f", dat->m_flValue);
+			SetString(keyName, buf);
+			break;
+		}
 
-			case TYPE_INT:
-			case TYPE_PTR:
-			{
-				Q_snprintf(buf, 64, "%d", dat->m_iValue);
-				SetString(keyName, buf);
-				break;
-			}
+		case TYPE_INT:
+		case TYPE_PTR:
+		{
+			Q_snprintf(buf, 64, "%d", dat->m_iValue);
+			SetString(keyName, buf);
+			break;
+		}
 
-			case TYPE_UINT64:
-			{
-				Q_snprintf(buf, sizeof(buf), "%I64i", *((uint64 *)(dat->m_sValue)));
-				SetString(keyName, buf);
-				break;
-			}
+		case TYPE_UINT64:
+		{
+			Q_snprintf(buf, sizeof(buf), "%I64i", *((uint64 *)(dat->m_sValue)));
+			SetString(keyName, buf);
+			break;
+		}
 
-			case TYPE_WSTRING:
-			{
+		case TYPE_WSTRING:
+		{
 #ifdef _WIN32
-				static char buf[512];
-				int result = ::WideCharToMultiByte(CP_UTF8, 0, dat->m_wsValue, -1, buf, 512, NULL, NULL);
+			static char buf[512];
+			int result = ::WideCharToMultiByte(CP_UTF8, 0, dat->m_wsValue, -1, buf, 512, NULL, NULL);
 
-				if (result)
-				{
-					SetString(keyName, buf);
-				}
-				else
-				{
-					return defaultValue;
-				}
-#endif
-				break;
-			}
-
-			case TYPE_STRING:
+			if (result)
 			{
-				break;
+				SetString(keyName, buf);
 			}
-
-			default:
+			else
 			{
 				return defaultValue;
 			}
+#endif
+			break;
+		}
+
+		case TYPE_STRING:
+		{
+			break;
+		}
+
+		default:
+		{
+			return defaultValue;
+		}
 		}
 
 		return dat->m_sValue;
@@ -1055,48 +1055,48 @@ const wchar_t *KeyValues::GetWString(const char *keyName, const wchar_t *default
 
 		switch (dat->m_iDataType)
 		{
-			case TYPE_FLOAT:
-			{
-				swprintf(wbuf, L"%f", dat->m_flValue);
-				SetWString(keyName, wbuf);
-				break;
-			}
+		case TYPE_FLOAT:
+		{
+			swprintf(wbuf, L"%f", dat->m_flValue);
+			SetWString(keyName, wbuf);
+			break;
+		}
 
-			case TYPE_INT:
-			case TYPE_PTR:
-			{
-				swprintf(wbuf, L"%d", dat->m_iValue);
-				SetWString(keyName, wbuf);
-				break;
-			}
+		case TYPE_INT:
+		case TYPE_PTR:
+		{
+			swprintf(wbuf, L"%d", dat->m_iValue);
+			SetWString(keyName, wbuf);
+			break;
+		}
 
-			case TYPE_UINT64:
-			{
-				swprintf(wbuf, L"%I64i", *((uint64 *)(dat->m_sValue)));
-				SetWString(keyName, wbuf);
-				break;
-			}
+		case TYPE_UINT64:
+		{
+			swprintf(wbuf, L"%I64i", *((uint64 *)(dat->m_sValue)));
+			SetWString(keyName, wbuf);
+			break;
+		}
 
-			case TYPE_WSTRING:
-			{
-				break;
-			}
+		case TYPE_WSTRING:
+		{
+			break;
+		}
 
-			case TYPE_STRING:
-			{
+		case TYPE_STRING:
+		{
 
-				static wchar_t wbuftemp[512];
-				int result = ::MultiByteToWideChar(CP_UTF8, 0, dat->m_sValue, -1, wbuftemp, 512);
+			static wchar_t wbuftemp[512];
+			int result = ::MultiByteToWideChar(CP_UTF8, 0, dat->m_sValue, -1, wbuftemp, 512);
 
-				if (result)
-					SetWString(keyName, wbuftemp);
-				else
-					return defaultValue;
+			if (result)
+				SetWString(keyName, wbuftemp);
+			else
+				return defaultValue;
 
-				break;
-			}
+			break;
+		}
 
-			default: return defaultValue;
+		default: return defaultValue;
 		}
 
 		return (const wchar_t *)dat->m_wsValue;
@@ -1168,7 +1168,7 @@ void KeyValues::SetColor(const char *keyName, Color value)
 void KeyValues::SetStringValue(char const *strValue)
 {
 	if (m_iDataType == TYPE_STRING || m_iDataType == TYPE_WSTRING)
-		delete [] m_pValue;
+		delete[] m_pValue;
 
 	if (!strValue)
 		strValue = "";
@@ -1187,7 +1187,7 @@ void KeyValues::SetString(const char *keyName, const char *value)
 	if (dat)
 	{
 		if (dat->m_iDataType == TYPE_STRING || dat->m_iDataType == TYPE_WSTRING)
-			delete [] dat->m_pValue;
+			delete[] dat->m_pValue;
 
 		if (!value)
 			value = "";
@@ -1207,7 +1207,7 @@ void KeyValues::SetWString(const char *keyName, const wchar_t *value)
 	if (dat)
 	{
 		if (dat->m_iDataType == TYPE_STRING || dat->m_iDataType == TYPE_WSTRING)
-			delete [] dat->m_pValue;
+			delete[] dat->m_pValue;
 
 		if (!value)
 			value = L"";
@@ -1227,7 +1227,7 @@ void KeyValues::SetInt(const char *keyName, int value)
 	if (dat)
 	{
 		if (dat->m_iDataType == TYPE_STRING || dat->m_iDataType == TYPE_WSTRING)
-			delete [] dat->m_pValue;
+			delete[] dat->m_pValue;
 
 		dat->m_iValue = value;
 		dat->m_iDataType = TYPE_INT;
@@ -1241,7 +1241,7 @@ void KeyValues::SetUint64(const char *keyName, uint64 value)
 	if (dat)
 	{
 		if (dat->m_iDataType == TYPE_STRING || dat->m_iDataType == TYPE_WSTRING)
-			delete [] dat->m_pValue;
+			delete[] dat->m_pValue;
 
 		dat->m_sValue = new char[sizeof(uint64)];
 		*((uint64 *)dat->m_sValue) = value;
@@ -1256,7 +1256,7 @@ void KeyValues::SetFloat(const char *keyName, float value)
 	if (dat)
 	{
 		if (dat->m_iDataType == TYPE_STRING || dat->m_iDataType == TYPE_WSTRING)
-			delete [] dat->m_pValue;
+			delete[] dat->m_pValue;
 
 		dat->m_flValue = value;
 		dat->m_iDataType = TYPE_FLOAT;
@@ -1275,7 +1275,7 @@ void KeyValues::SetPtr(const char *keyName, void *value)
 	if (dat)
 	{
 		if (dat->m_iDataType == TYPE_STRING || dat->m_iDataType == TYPE_WSTRING)
-			delete [] dat->m_pValue;
+			delete[] dat->m_pValue;
 
 		dat->m_pValue = value;
 		dat->m_iDataType = TYPE_PTR;
@@ -1294,67 +1294,67 @@ void KeyValues::RecursiveCopyKeyValues(KeyValues &src)
 
 		switch (src.m_iDataType)
 		{
-			case TYPE_NONE:
+		case TYPE_NONE:
+		{
+			break;
+		}
+
+		case TYPE_STRING:
+		{
+			if (src.m_sValue)
 			{
-				break;
+				m_sValue = new char[Q_strlen(src.m_sValue) + 1];
+				Q_strcpy(m_sValue, src.m_sValue);
 			}
 
-			case TYPE_STRING:
-			{
-				if (src.m_sValue)
-				{
-					m_sValue = new char[Q_strlen(src.m_sValue) + 1];
-					Q_strcpy(m_sValue, src.m_sValue);
-				}
+			break;
+		}
 
-				break;
-			}
+		case TYPE_INT:
+		{
+			m_iValue = src.m_iValue;
+			Q_snprintf(buf, sizeof(buf), "%d", m_iValue);
+			m_sValue = new char[strlen(buf) + 1];
+			Q_strcpy(m_sValue, buf);
+			break;
+		}
 
-			case TYPE_INT:
-			{
-				m_iValue = src.m_iValue;
-				Q_snprintf(buf, sizeof(buf), "%d", m_iValue);
-				m_sValue = new char[strlen(buf) + 1];
-				Q_strcpy(m_sValue, buf);
-				break;
-			}
+		case TYPE_FLOAT:
+		{
+			m_flValue = src.m_flValue;
+			Q_snprintf(buf, sizeof(buf), "%f", m_flValue);
+			m_sValue = new char[strlen(buf) + 1];
+			Q_strcpy(m_sValue, buf);
+			break;
+		}
 
-			case TYPE_FLOAT:
-			{
-				m_flValue = src.m_flValue;
-				Q_snprintf(buf, sizeof(buf), "%f", m_flValue);
-				m_sValue = new char[strlen(buf) + 1];
-				Q_strcpy(m_sValue, buf);
-				break;
-			}
+		case TYPE_PTR:
+		{
+			m_pValue = src.m_pValue;
+			break;
+		}
 
-			case TYPE_PTR:
-			{
-				m_pValue = src.m_pValue;
-				break;
-			}
+		case TYPE_UINT64:
+		{
+			m_sValue = new char[sizeof(uint64)];
+			Q_memcpy(m_sValue, src.m_sValue, sizeof(uint64));
+			break;
+		}
 
-			case TYPE_UINT64:
-			{
-				m_sValue = new char[sizeof(uint64)];
-				Q_memcpy(m_sValue, src.m_sValue, sizeof(uint64));
-				break;
-			}
+		case TYPE_COLOR:
+		{
+			m_Color[0] = src.m_Color[0];
+			m_Color[1] = src.m_Color[1];
+			m_Color[2] = src.m_Color[2];
+			m_Color[3] = src.m_Color[3];
+			break;
+		}
 
-			case TYPE_COLOR:
-			{
-				m_Color[0] = src.m_Color[0];
-				m_Color[1] = src.m_Color[1];
-				m_Color[2] = src.m_Color[2];
-				m_Color[3] = src.m_Color[3];
-				break;
-			}
-
-			default:
-			{
-				Assert(0);
-				break;
-			}
+		default:
+		{
+			Assert(0);
+			break;
+		}
 		}
 	}
 
@@ -1404,64 +1404,64 @@ KeyValues *KeyValues::MakeCopy(void) const
 
 	switch (m_iDataType)
 	{
-		case TYPE_STRING:
+	case TYPE_STRING:
+	{
+		if (m_sValue)
 		{
-			if (m_sValue)
-			{
-				int len = Q_strlen(m_sValue);
-				assert(!newKeyValue->m_sValue);
-				newKeyValue->m_sValue = new char[len + 1];
-				Q_memcpy(newKeyValue->m_sValue, m_sValue, len + 1);
-			}
-
-			break;
+			int len = Q_strlen(m_sValue);
+			assert(!newKeyValue->m_sValue);
+			newKeyValue->m_sValue = new char[len + 1];
+			Q_memcpy(newKeyValue->m_sValue, m_sValue, len + 1);
 		}
 
-		case TYPE_WSTRING:
-		{
-			if (m_wsValue)
-			{
-				int len = wcslen(m_wsValue);
-				newKeyValue->m_wsValue = new wchar_t[len + 1];
-				Q_memcpy(newKeyValue->m_wsValue, m_wsValue, (len + 1) * sizeof(wchar_t));
-			}
+		break;
+	}
 
-			break;
+	case TYPE_WSTRING:
+	{
+		if (m_wsValue)
+		{
+			int len = wcslen(m_wsValue);
+			newKeyValue->m_wsValue = new wchar_t[len + 1];
+			Q_memcpy(newKeyValue->m_wsValue, m_wsValue, (len + 1) * sizeof(wchar_t));
 		}
 
-		case TYPE_INT:
-		{
-			newKeyValue->m_iValue = m_iValue;
-			break;
-		}
+		break;
+	}
 
-		case TYPE_FLOAT:
-		{
-			newKeyValue->m_flValue = m_flValue;
-			break;
-		}
+	case TYPE_INT:
+	{
+		newKeyValue->m_iValue = m_iValue;
+		break;
+	}
 
-		case TYPE_PTR:
-		{
-			newKeyValue->m_pValue = m_pValue;
-			break;
-		}
+	case TYPE_FLOAT:
+	{
+		newKeyValue->m_flValue = m_flValue;
+		break;
+	}
 
-		case TYPE_COLOR:
-		{
-			newKeyValue->m_Color[0] = m_Color[0];
-			newKeyValue->m_Color[1] = m_Color[1];
-			newKeyValue->m_Color[2] = m_Color[2];
-			newKeyValue->m_Color[3] = m_Color[3];
-			break;
-		}
+	case TYPE_PTR:
+	{
+		newKeyValue->m_pValue = m_pValue;
+		break;
+	}
 
-		case TYPE_UINT64:
-		{
-			newKeyValue->m_sValue = new char[sizeof(uint64)];
-			Q_memcpy(newKeyValue->m_sValue, m_sValue, sizeof(uint64));
-			break;
-		}
+	case TYPE_COLOR:
+	{
+		newKeyValue->m_Color[0] = m_Color[0];
+		newKeyValue->m_Color[1] = m_Color[1];
+		newKeyValue->m_Color[2] = m_Color[2];
+		newKeyValue->m_Color[3] = m_Color[3];
+		break;
+	}
+
+	case TYPE_UINT64:
+	{
+		newKeyValue->m_sValue = new char[sizeof(uint64)];
+		Q_memcpy(newKeyValue->m_sValue, m_sValue, sizeof(uint64));
+		break;
+	}
 	}
 
 	CopySubkeys(newKeyValue);
@@ -1684,8 +1684,7 @@ bool KeyValues::LoadFromBuffer(char const *resourceName, CUtlBuffer &buf, IFileS
 		pPreviousKey = pCurrentKey;
 		pCurrentKey = NULL;
 
-	}
-	while (buf.IsValid());
+	} while (buf.IsValid());
 
 	AppendIncludedKeys(includedKeys);
 	{
@@ -1741,7 +1740,7 @@ void KeyValues::RecursiveLoadFromBuffer(char const *resourceName, CUtlBuffer &bu
 			break;
 		}
 
-		if (*name == '}' && !wasQuoted )
+		if (*name == '}' && !wasQuoted)
 			break;
 
 		KeyValues *dat = CreateKey(name);
@@ -1767,11 +1766,11 @@ void KeyValues::RecursiveLoadFromBuffer(char const *resourceName, CUtlBuffer &bu
 			errorKey.Reset(INVALID_KEY_SYMBOL);
 			dat->RecursiveLoadFromBuffer(resourceName, buf);
 		}
-		else 
+		else
 		{
 			if (dat->m_sValue)
 			{
-				delete [] dat->m_sValue;
+				delete[] dat->m_sValue;
 				dat->m_sValue = NULL;
 			}
 
@@ -1804,18 +1803,18 @@ void KeyValues::RecursiveLoadFromBuffer(char const *resourceName, CUtlBuffer &bu
 					retVal = (retVal * 16) + (digit - '0');
 				}
 
-				dat->m_sValue = new char [sizeof(uint64)];
+				dat->m_sValue = new char[sizeof(uint64)];
 				*((uint64 *)dat->m_sValue) = retVal;
 				dat->m_iDataType = TYPE_UINT64;
 			}
 			else if ((pFEnd > pIEnd) && (pFEnd == pSEnd))
 			{
-				dat->m_flValue = fval; 
+				dat->m_flValue = fval;
 				dat->m_iDataType = TYPE_FLOAT;
 			}
 			else if (pIEnd == pSEnd)
 			{
-				dat->m_iValue = ival; 
+				dat->m_iValue = ival;
 				dat->m_iDataType = TYPE_INT;
 			}
 			else
@@ -1847,72 +1846,72 @@ bool KeyValues::WriteAsBinary(CUtlBuffer &buffer)
 
 		switch (dat->m_iDataType)
 		{
-			case TYPE_NONE:
+		case TYPE_NONE:
+		{
+			dat->m_pSub->WriteAsBinary(buffer);
+			break;
+		}
+
+		case TYPE_STRING:
+		{
+			if (dat->m_sValue && *(dat->m_sValue))
 			{
-				dat->m_pSub->WriteAsBinary(buffer);
-				break;
+				buffer.PutString(dat->m_sValue);
+			}
+			else
+			{
+				buffer.PutString("");
 			}
 
-			case TYPE_STRING:
-			{
-				if (dat->m_sValue && *(dat->m_sValue))
-				{
-					buffer.PutString(dat->m_sValue);
-				}
-				else
-				{
-					buffer.PutString("");
-				}
+			break;
+		}
 
-				break;
-			}
+		case TYPE_WSTRING:
+		{
+			Assert(!"TYPE_WSTRING");
+			break;
+		}
 
-			case TYPE_WSTRING:
-			{
-				Assert(!"TYPE_WSTRING");
-				break;
-			}
+		case TYPE_INT:
+		{
+			buffer.PutInt(dat->m_iValue);
+			break;
+		}
 
-			case TYPE_INT:
-			{
-				buffer.PutInt(dat->m_iValue);
-				break;
-			}
+		case TYPE_UINT64:
+		{
+			buffer.PutDouble(*((double *)dat->m_sValue));
+			break;
+		}
 
-			case TYPE_UINT64:
-			{
-				buffer.PutDouble(*((double *)dat->m_sValue));
-				break;
-			}
+		case TYPE_FLOAT:
+		{
+			buffer.PutFloat(dat->m_flValue);
+			break;
+		}
 
-			case TYPE_FLOAT:
-			{
-				buffer.PutFloat(dat->m_flValue);
-				break;
-			}
+		case TYPE_COLOR:
+		{
+			buffer.PutUnsignedChar(dat->m_Color[0]);
+			buffer.PutUnsignedChar(dat->m_Color[1]);
+			buffer.PutUnsignedChar(dat->m_Color[2]);
+			buffer.PutUnsignedChar(dat->m_Color[3]);
+			break;
+		}
 
-			case TYPE_COLOR:
-			{
-				buffer.PutUnsignedChar(dat->m_Color[0]);
-				buffer.PutUnsignedChar(dat->m_Color[1]);
-				buffer.PutUnsignedChar(dat->m_Color[2]);
-				buffer.PutUnsignedChar(dat->m_Color[3]);
-				break;
-			}
+		case TYPE_PTR:
+		{
+			buffer.PutUnsignedInt((int)dat->m_pValue);
+		}
 
-			case TYPE_PTR:
-			{
-				buffer.PutUnsignedInt((int)dat->m_pValue);
-			}
-
-			default:
-			{
-				break;
-			}
+		default:
+		{
+			break;
+		}
 		}
 	}
 
-	buffer.PutUnsignedChar(TYPE_NUMTYPES); 
+	buffer.PutUnsignedChar(TYPE_NUMTYPES);
 	return buffer.IsValid();
 }
 
@@ -1945,67 +1944,67 @@ bool KeyValues::ReadAsBinary(CUtlBuffer &buffer)
 
 		switch (type)
 		{
-			case TYPE_NONE:
-			{
-				dat->m_pSub = new KeyValues("");
-				dat->m_pSub->ReadAsBinary(buffer);
-				break;
-			}
+		case TYPE_NONE:
+		{
+			dat->m_pSub = new KeyValues("");
+			dat->m_pSub->ReadAsBinary(buffer);
+			break;
+		}
 
-			case TYPE_STRING:
-			{
-				buffer.GetString(token, KEYVALUES_TOKEN_SIZE - 1);
-				token[KEYVALUES_TOKEN_SIZE - 1] = 0;
+		case TYPE_STRING:
+		{
+			buffer.GetString(token, KEYVALUES_TOKEN_SIZE - 1);
+			token[KEYVALUES_TOKEN_SIZE - 1] = 0;
 
-				int len = Q_strlen(token);
-				dat->m_sValue = new char[len + 1];
-				Q_memcpy(dat->m_sValue, token, len + 1);
+			int len = Q_strlen(token);
+			dat->m_sValue = new char[len + 1];
+			Q_memcpy(dat->m_sValue, token, len + 1);
 
-				break;
-			}
+			break;
+		}
 
-			case TYPE_WSTRING:
-			{
-				Assert(!"TYPE_WSTRING");
-				break;
-			}
+		case TYPE_WSTRING:
+		{
+			Assert(!"TYPE_WSTRING");
+			break;
+		}
 
-			case TYPE_INT:
-			{
-				dat->m_iValue = buffer.GetInt();
-				break;
-			}
+		case TYPE_INT:
+		{
+			dat->m_iValue = buffer.GetInt();
+			break;
+		}
 
-			case TYPE_UINT64:
-			{
-				dat->m_sValue = new char[sizeof(uint64)];
-				*((double *)dat->m_sValue) = buffer.GetDouble();
-			}
+		case TYPE_UINT64:
+		{
+			dat->m_sValue = new char[sizeof(uint64)];
+			*((double *)dat->m_sValue) = buffer.GetDouble();
+		}
 
-			case TYPE_FLOAT:
-			{
-				dat->m_flValue = buffer.GetFloat();
-				break;
-			}
+		case TYPE_FLOAT:
+		{
+			dat->m_flValue = buffer.GetFloat();
+			break;
+		}
 
-			case TYPE_COLOR:
-			{
-				dat->m_Color[0] = buffer.GetUnsignedChar();
-				dat->m_Color[1] = buffer.GetUnsignedChar();
-				dat->m_Color[2] = buffer.GetUnsignedChar();
-				dat->m_Color[3] = buffer.GetUnsignedChar();
-				break;
-			}
+		case TYPE_COLOR:
+		{
+			dat->m_Color[0] = buffer.GetUnsignedChar();
+			dat->m_Color[1] = buffer.GetUnsignedChar();
+			dat->m_Color[2] = buffer.GetUnsignedChar();
+			dat->m_Color[3] = buffer.GetUnsignedChar();
+			break;
+		}
 
-			case TYPE_PTR:
-			{
-				dat->m_pValue = (void *)buffer.GetUnsignedInt();
-			}
+		case TYPE_PTR:
+		{
+			dat->m_pValue = (void *)buffer.GetUnsignedInt();
+		}
 
-			default:
-			{
-				break;
-			}
+		default:
+		{
+			break;
+		}
 		}
 
 		if (!buffer.IsValid())
@@ -2040,9 +2039,14 @@ void KeyValues::operator delete(void *pMem)
 	KeyValuesSystem()->FreeKeyValuesMemory(pMem);
 }
 
+void KeyValues::operator delete(void* pMem, unsigned int iAllocSize, int nBlockUse, const char* pFileName, int nLine)
+{
+	KeyValuesSystem()->FreeKeyValuesMemory(pMem);
+}
+
 void KeyValues::UnpackIntoStructure(KeyValuesUnpackStructure const *pUnpackTable, void *pDest)
 {
-	uint8 *dest = (uint8 *) pDest;
+	uint8 *dest = (uint8 *)pDest;
 
 	while (pUnpackTable->m_pKeyName)
 	{
@@ -2051,86 +2055,86 @@ void KeyValues::UnpackIntoStructure(KeyValuesUnpackStructure const *pUnpackTable
 
 		switch (pUnpackTable->m_eDataType)
 		{
-			case UNPACK_TYPE_FLOAT:
+		case UNPACK_TYPE_FLOAT:
+		{
+			float default_value = (pUnpackTable->m_pKeyDefault) ? atof(pUnpackTable->m_pKeyDefault) : 0.0;
+			*((float *)dest_field) = GetFloat(pUnpackTable->m_pKeyName, default_value);
+			break;
+		}
+
+		case UNPACK_TYPE_VECTOR:
+		{
+			float *dest_v = (float *)dest_field;
+			char const *src_string = GetString(pUnpackTable->m_pKeyName, pUnpackTable->m_pKeyDefault);
+
+			if ((!src_string) || (sscanf(src_string, "%f %f %f", &(dest_v[0]), &(dest_v[1]), &(dest_v[2])) != 3))
+				memset(dest_v, 0, 3 * sizeof(float));
+
+			break;
+		}
+
+		case UNPACK_TYPE_FOUR_FLOATS:
+		{
+			float *dest_f = (float *)dest_field;
+			char const *src_string = GetString(pUnpackTable->m_pKeyName, pUnpackTable->m_pKeyDefault);
+
+			if ((!src_string) || (sscanf(src_string, "%f %f %f %f", dest_f, dest_f + 1, dest_f + 2, dest_f + 3)) != 4)
+				memset(dest_f, 0, 4 * sizeof(float));
+
+			break;
+		}
+
+		case UNPACK_TYPE_TWO_FLOATS:
+		{
+			float *dest_f = (float *)dest_field;
+			char const *src_string = GetString(pUnpackTable->m_pKeyName, pUnpackTable->m_pKeyDefault);
+
+			if ((!src_string) || (sscanf(src_string, "%f %f", dest_f, dest_f + 1)) != 2)
+				memset(dest_f, 0, 2 * sizeof(float));
+
+			break;
+		}
+
+		case UNPACK_TYPE_STRING:
+		{
+			char *dest_s = (char *)dest_field;
+			strncpy(dest_s, GetString(pUnpackTable->m_pKeyName, pUnpackTable->m_pKeyDefault), pUnpackTable->m_nFieldSize);
+			break;
+		}
+
+		case UNPACK_TYPE_INT:
+		{
+			int *dest_i = (int *)dest_field;
+			int default_int = 0;
+
+			if (pUnpackTable->m_pKeyDefault)
+				default_int = atoi(pUnpackTable->m_pKeyDefault);
+
+			*(dest_i) = GetInt(pUnpackTable->m_pKeyName, default_int);
+			break;
+		}
+
+		case UNPACK_TYPE_VECTOR_COLOR:
+		{
+			float *dest_v = (float *)dest_field;
+
+			if (find_it)
 			{
-				float default_value = (pUnpackTable->m_pKeyDefault) ? atof(pUnpackTable->m_pKeyDefault) : 0.0;
-				*((float *) dest_field) = GetFloat(pUnpackTable->m_pKeyName, default_value);
-				break;
+				Color c = GetColor(pUnpackTable->m_pKeyName);
+				dest_v[0] = c.r();
+				dest_v[1] = c.g();
+				dest_v[2] = c.b();
 			}
-
-			case UNPACK_TYPE_VECTOR:
+			else
 			{
-				float *dest_v = (float *)dest_field;
-				char const *src_string = GetString(pUnpackTable->m_pKeyName, pUnpackTable->m_pKeyDefault);
-
-				if ((!src_string) || (sscanf(src_string, "%f %f %f", &(dest_v[0]), &(dest_v[1]), &(dest_v[2])) != 3))
-					memset(dest_v, 0, 3 * sizeof(float));
-
-				break;
-			}
-
-			case UNPACK_TYPE_FOUR_FLOATS:
-			{
-				float *dest_f = (float *)dest_field;
-				char const *src_string = GetString(pUnpackTable->m_pKeyName, pUnpackTable->m_pKeyDefault);
-
-				if ((!src_string) || (sscanf(src_string, "%f %f %f %f", dest_f, dest_f + 1, dest_f + 2, dest_f + 3)) != 4)
-					memset(dest_f, 0, 4 * sizeof(float));
-
-				break;
-			}
-
-			case UNPACK_TYPE_TWO_FLOATS:
-			{
-				float *dest_f = (float *)dest_field;
-				char const *src_string = GetString(pUnpackTable->m_pKeyName, pUnpackTable->m_pKeyDefault);
-
-				if ((!src_string) || (sscanf(src_string,"%f %f", dest_f, dest_f + 1)) != 2)
-					memset(dest_f, 0, 2 * sizeof(float));
-
-				break;
-			}
-
-			case UNPACK_TYPE_STRING:
-			{
-				char *dest_s = (char *)dest_field;
-				strncpy(dest_s, GetString(pUnpackTable->m_pKeyName, pUnpackTable->m_pKeyDefault), pUnpackTable->m_nFieldSize);
-				break;
-			}
-
-			case UNPACK_TYPE_INT:
-			{
-				int *dest_i = (int *)dest_field;
-				int default_int = 0;
-
 				if (pUnpackTable->m_pKeyDefault)
-					default_int = atoi(pUnpackTable->m_pKeyDefault);
-
-				*(dest_i) = GetInt(pUnpackTable->m_pKeyName, default_int);
-				break;
-			}
-
-			case UNPACK_TYPE_VECTOR_COLOR:
-			{
-				float *dest_v = (float *)dest_field;
-
-				if (find_it)
-				{
-					Color c = GetColor(pUnpackTable->m_pKeyName);
-					dest_v[0] = c.r();
-					dest_v[1] = c.g();
-					dest_v[2] = c.b();
-				}
+					sscanf(pUnpackTable->m_pKeyDefault, "%f %f %f", &(dest_v[0]), &(dest_v[1]), &(dest_v[2]));
 				else
-				{
-					if (pUnpackTable->m_pKeyDefault)
-						sscanf(pUnpackTable->m_pKeyDefault, "%f %f %f", &(dest_v[0]), &(dest_v[1]), &(dest_v[2]));
-					else
-						memset(dest_v, 0, 3 * sizeof(float));
-				}
-
-				*(dest_v) *= (1.0 / 255);
+					memset(dest_v, 0, 3 * sizeof(float));
 			}
+
+			*(dest_v) *= (1.0 / 255);
+		}
 		}
 
 		pUnpackTable++;
@@ -2147,7 +2151,7 @@ bool KeyValues::ProcessResolutionKeys(const char *pResString)
 	if (!pSubKey)
 		return false;
 
-	for ( ; pSubKey != NULL; pSubKey = pSubKey->GetNextKey())
+	for (; pSubKey != NULL; pSubKey = pSubKey->GetNextKey())
 	{
 		pSubKey->ProcessResolutionKeys(pResString);
 
@@ -2177,18 +2181,18 @@ bool KeyValues::ProcessResolutionKeys(const char *pResString)
 	return true;
 }
 
-bool EvaluateConditional( const char *str )
+bool EvaluateConditional(const char *str)
 {
 	bool bResult = false;
 	bool bXboxUI = IsX360();
 
-	if ( bXboxUI )
+	if (bXboxUI)
 	{
-		bResult = !Q_stricmp( "[$X360]", str );
+		bResult = !Q_stricmp("[$X360]", str);
 	}
 	else
 	{
-		bResult = !Q_stricmp( "[$WIN32]", str );
+		bResult = !Q_stricmp("[$WIN32]", str);
 	}
 
 	return bResult;

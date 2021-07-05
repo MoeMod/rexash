@@ -18,7 +18,6 @@
 //-----------------------------------------------------------------------------
 // dll export stuff
 //-----------------------------------------------------------------------------
-#if 0
 #ifdef VSTDLIB_DLL_EXPORT
 #define VSTDLIB_INTERFACE	DLL_EXPORT
 #define VSTDLIB_OVERLOAD	DLL_GLOBAL_EXPORT
@@ -29,12 +28,6 @@
 #define VSTDLIB_OVERLOAD	DLL_GLOBAL_IMPORT
 #define VSTDLIB_CLASS		DLL_CLASS_IMPORT
 #define VSTDLIB_GLOBAL		DLL_GLOBAL_IMPORT
-#endif
-#else
-#define VSTDLIB_INTERFACE
-#define VSTDLIB_OVERLOAD
-#define VSTDLIB_CLASS
-#define VSTDLIB_GLOBAL
 #endif
  
 #endif // VSTDLIB_H

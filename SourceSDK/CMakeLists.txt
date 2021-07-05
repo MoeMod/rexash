@@ -1,5 +1,5 @@
 
-set(HL2SDK_PATH "." CACHE PATH "Path to hl2sdk")
+set(HL2SDK_PATH ${CMAKE_CURRENT_SOURCE_DIR} CACHE PATH "Path to hl2sdk")
 
 set(CMAKE_CXX_STANDARD 17)
 if(MSVC)
@@ -53,8 +53,6 @@ elseif(WIN32)
     set(HL2SDK_LIB_STATIC_SUFFIX "")
 endif()
 
-link_directories(${HL2SDK_LIB_DIR})
-
 if(MSVC)
     add_compile_options(-DCOMPILER_MSVC)
     if(HL2SDK_64BIT)
@@ -105,18 +103,13 @@ target_include_directories(vinterface PUBLIC
         ${HL2SDK_PATH}/public/tier1
 )
 
-
-add_library(vstdlib STATIC
-        ${HL2SDK_PATH}/vstdlib/random.cpp
-        ${HL2SDK_PATH}/vstdlib/keyvaluessystem.cpp
-)
-target_include_directories(vstdlib PUBLIC
+add_library(vstdlib INTERFACE)
+target_include_directories(vstdlib INTERFACE
         ${HL2SDK_PATH}/public
         ${HL2SDK_PATH}/public/vstdlib
         )
-target_compile_definitions(vstdlib PRIVATE
-    -DVSTDLIB_DLL_EXPORT
-)
+target_link_libraries(vstdlib INTERFACE vstdlib${HL2SDK_LIB_STATIC_SUFFIX}${HL2SDK_LIB_STATIC_EXT})
+target_link_directories(vstdlib INTERFACE ${HL2SDK_LIB_DIR})
 
 add_library(tier0_h INTERFACE)
 target_include_directories(tier0_h INTERFACE
@@ -219,7 +212,6 @@ target_include_directories(mathlib PUBLIC
 )
 
 target_link_libraries(tier1 PUBLIC vinterface tier0 mathlib)
-target_link_libraries(vstdlib PUBLIC vinterface tier0)
 
 add_library(SourceSDK STATIC 
     FileSystem_Helpers.cpp

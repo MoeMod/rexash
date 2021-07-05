@@ -7,8 +7,17 @@
 #include <vgui/IVGui.h>
 #include <vgui/IPanel.h>
 #include <vgui/ILocalize.h>
+#include <vgui/IKeyValues.h>
+#include <tier1/KeyValues.h>
 #include <FileSystem.h>
 #include "controls.h"
+
+IKeyValues* g_pKeyValuesInterface = nullptr;
+
+IKeyValues* keyvalues()
+{
+	return g_pKeyValuesInterface;
+}
 
 namespace vgui2
 {
@@ -88,12 +97,17 @@ namespace vgui2
 		g_pInputInterface = (IInputInternal *)InitializeInterface(VGUI_INPUTINTERNAL_INTERFACE_VERSION, factoryList, numFactories);
 		g_pLocalizeInterface = (ILocalize *)InitializeInterface(VGUI_LOCALIZE_INTERFACE_VERSION, factoryList, numFactories);
 		g_pFileSystemInterface = (IFileSystem *)InitializeInterface(FILESYSTEM_INTERFACE_VERSION, factoryList, numFactories);
+
+		g_pKeyValuesInterface = static_cast<IKeyValues*>(InitializeInterface(KEYVALUES_INTERFACE_VERSION, factoryList, numFactories));
 		
 		if (!g_pVGuiInterface) {
 			return false;
 		}
 
 		g_pVGuiInterface->Init(factoryList, numFactories);
+
+		if (g_pKeyValuesInterface)
+			g_pKeyValuesInterface->RegisterSizeofKeyValues(sizeof(KeyValues));
 
 		if (g_pSchemeInterface &&
 			g_pSurfaceInterface &&
